@@ -73,5 +73,21 @@ T is large
 
 Relation to Binary Integer Linear Programming
 
-Quantum Annealer
+Quantum Annealer -
+Finds the minimum energy of the system
+Superset of Adiabatic Optimisation 
 
+Variational Circuit:
+1. Run the QPU for a very short time
+2. Get the measurements on a CPU
+3. Change the parameters
+4. Repeat
+
+Quantum Approximate Optimisation Algorithm:
+1. Approximate Adiabatic Computation using Gates
+2. Multiple discrete times calculating the energy and building up the ground state of the question hamiltonian
+
+$U_{T} = U_{t_{1}}U_{t_{2}}U_{t_{3}}U_{t_{4}}...U_{t_{n}}$ 
+This is called <i>Trotterisation</i>
+More the steps better the approximatation
+Ground state of the simple hamiltonian is the joint superposition of all states
