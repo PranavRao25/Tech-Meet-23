@@ -1,4 +1,5 @@
 from datetime import datetime
+import pandas as pd
 
 
 def PrintGraph(graph):
@@ -10,21 +11,26 @@ def PrintGraph(graph):
             print(f"Edge -> {v}")
 
 
-def MakeGraph(database):
+def MakeGraph():
+
     graph = dict()
 
-    for data in database:
+    df = pd.read_csv('schedule.csv')
 
-        if data["source"] not in graph:
-            graph[data["source"]] = []
+    for i in range(0, len(df)):
 
-        temp = datetime.strptime(data["date of departure"], "%d %B %Y")
-        departure = datetime.strptime(data["departure time"].replace(' ', ''), "%H:%M:%S")
-        departure = departure.replace(day=temp.day, month=temp.month, year=temp.year)
+        data = df.loc[i]
 
-        temp = datetime.strptime(data["date of arrival"], "%d %B %Y")
-        arrival = datetime.strptime(data["arrival time"].replace(' ', ''), "%H:%M:%S")
-        arrival = arrival.replace(day=temp.day, month=temp.month, year=temp.year)
+        if data["DepartureAirport"] not in graph:
+            graph[data["DepartureAirport"]] = []
+
+        # temp = datetime.strptime(data["date of departure"], "%d %B %Y")
+        departure = datetime.strptime(data["DepartureTime"].replace(' ', ''), "%H:%M")
+        # departure = departure.replace(day=temp.day, month=temp.month, year=temp.year)
+
+        # temp = datetime.strptime(data["date of arrival"], "%d %B %Y")
+        arrival = datetime.strptime(data["ArrivalTime"].replace(' ', ''), "%H:%M")
+        # arrival = arrival.replace(day=temp.day, month=temp.month, year=temp.year)
 
         # Calculating the journey time
         hours = arrival.hour - departure.hour
@@ -32,14 +38,14 @@ def MakeGraph(database):
         seconds = arrival.second - departure.second
 
         time_of_flight = hours * 3600 + minutes * 60 + seconds
-
-        graph[data["source"]].append(
+        #
+        graph[data["DepartureAirport"]].append(
             {
-                "destination": data["destination"],
-                "flight name": data["flight name"],
-                "departure": departure,
-                "arrival": arrival,
-                "time": time_of_flight,
+                "ArrivalAirport": data["ArrivalAirport"],
+                "FlightNumber": data["FlightNumber"],
+                "Departure": departure,
+                "Arrival": arrival,
+                "Time": time_of_flight,
             },
         )
 
