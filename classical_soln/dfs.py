@@ -1,6 +1,7 @@
 def TimeDelay(first_flight, second_flight):
-    arrival_of_first_flight = first_flight["arrival"]
-    departure_of_second_flight = second_flight["departure"]
+
+    arrival_of_first_flight = first_flight["Arrival"]
+    departure_of_second_flight = second_flight["Departure"]
 
     # Check if the first flight arrives before the second flight departs
     if arrival_of_first_flight < departure_of_second_flight:
@@ -10,32 +11,32 @@ def TimeDelay(first_flight, second_flight):
 
 
 def dfs(g, start_edge, end, path, paths):
+
     path.append(start_edge)
 
-    if start_edge["destination"] == end:
+    if len(path) >= 5 or len(paths) >= 10:
+        path.pop()
+        return
 
+    if start_edge["ArrivalAirport"] == end:
         paths.append(path.copy())
-
     else:
-
-        for next_edge in g[start_edge["destination"]]:
-            if next_edge not in path:
-                if TimeDelay(start_edge, next_edge):
+        if start_edge["ArrivalAirport"] in g:
+            for next_edge in g[start_edge["ArrivalAirport"]]:
+                if next_edge not in path:
+                    # if TimeDelay(start_edge, next_edge):
+                    #     dfs(g, next_edge, end, path, paths)
                     dfs(g, next_edge, end, path, paths)
-
     path.pop()
-
 
 def AllPaths(g, source, destination):
     paths = list()
-
     for v in g[source]:
         dfs(g, v, destination, [], paths)
-
     return paths
 
-
 def PrintPaths(paths):
+
     i = 1
 
     for path in paths:
@@ -45,7 +46,7 @@ def PrintPaths(paths):
         for node in path:
             print()
             print(
-                f'\tDestination : {node["destination"]}\n\tFlight Name : {node["flight name"]}\n\tDeparture time from source : {node["departure"]}\n\tArrival time at destination : {node["arrival"]}')
+                f'\tArrivalAirport : {node["ArrivalAirport"]}\n\tFlightNumber: {node["FlightNumber"]}\n\tDeparture time from source : {node["Departure"]}\n\tArrival time at destination : {node["Arrival"]}')
             print()
 
         print()
