@@ -67,7 +67,7 @@ result = execute(qc, backend, shots=1000).result()
 counts = result.get_counts(qc)
 
 # Plot the results
-z=[]
+z = []
 for k in counts.keys():
-    z+=[int(k,2)]*counts[k]
+    z += [int(k, 2)]*counts[k]
 plt.hist(z)
