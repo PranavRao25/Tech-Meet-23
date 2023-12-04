@@ -1,14 +1,15 @@
 from qiskit import QuantumCircuit,QuantumRegister,ClassicalRegister
 from qiskit.circuit.library import XGate
+from qiskit import Aer, execute
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 def init():  # Initialise the Walk Circuit
-    qc = QuantumCircuit(coins, qubits, clas)
-    qc.x(qubits[0])  # Position 1
-    qc.h(coins[0])  # Coin vector put in superposition
-    return qc
+    circ = QuantumCircuit(coins, qubits, clas)
+    circ.x(qubits[0])  # Position 1
+    circ.h(coins[0])  # Coin vector put in superposition
+    return circ
 
 
 def add(coin, qubit):  # Increment the position value
@@ -50,10 +51,23 @@ def walk(coin, qubit, N):  # Walk N times
         qc.append(evol(coin, qubit), list(range(qc.num_qubits)))
 
 
+# Initialise
 qubits = QuantumRegister(7, 'nodes')
 coins = QuantumRegister(1, 'coins')
 clas = ClassicalRegister(7, 'meas')
 
+# Create and Run
 qc = init()
 walk(coins, qubits, len(qubits))
 qc.measure(qubits, clas)
+
+# Simulate and get the result
+backend = Aer.get_backend('qasm_simulator')
+result = execute(qc, backend, shots=1000).result()
+counts = result.get_counts(qc)
+
+# Plot the results
+z=[]
+for k in counts.keys():
+    z+=[int(k,2)]*counts[k]
+plt.hist(z)
