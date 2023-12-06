@@ -3,19 +3,34 @@ import pandas as pd
 
 
 def PrintGraph(graph):
+
     for key in graph:
-
         print(f"---------Node -> {key}---------")
-
         for v in graph[key]:
             print(f"Edge -> {v}")
 
-
 def MakeGraph():
 
-    graph = dict()
-
+    flight_time_map = dict()
     df = pd.read_csv('schedule.csv')
+
+    for i in range(0, len(df)):
+
+        data = df.loc[i]
+
+        if data["FlightNumber"] not in flight_time_map:
+            flight_time_map[data["FlightNumber"]] = []
+
+        flight_time_map[data["FlightNumber"]].append(
+            (
+                data["ScheduleID"],
+                data["DepartureTime"],
+                data["ArrivalTime"]
+             )
+        )
+
+    graph = dict()
+    df = pd.read_csv('INV.csv')
 
     for i in range(0, len(df)):
 
@@ -24,13 +39,23 @@ def MakeGraph():
         if data["DepartureAirport"] not in graph:
             graph[data["DepartureAirport"]] = []
 
-        # temp = datetime.strptime(data["date of departure"], "%d %B %Y")
-        departure = datetime.strptime(data["DepartureTime"].replace(' ', ''), "%H:%M")
-        # departure = departure.replace(day=temp.day, month=temp.month, year=temp.year)
+        departure = -1
+        arrival = -1
 
-        # temp = datetime.strptime(data["date of arrival"], "%d %B %Y")
-        arrival = datetime.strptime(data["ArrivalTime"].replace(' ', ''), "%H:%M")
-        # arrival = arrival.replace(day=temp.day, month=temp.month, year=temp.year)
+        for j in flight_time_map[data["FlightNumber"]]:
+            if data['ScheduleId'] == j[0]:
+                departure = datetime.strptime(j[1].replace(' ', ''), "%H:%M")
+                arrival = datetime.strptime(j[2].replace(' ', ''), "%H:%M")
+                break
+
+        if departure == -1 or arrival == -1:
+            print("No ScheduleID match found for given Inventory data")
+            print("Schedule ID ", data["ScheduleID"])
+
+        temp = datetime.strptime(data["DepartureDate"], "%m/%d/%Y")
+        departure = departure.replace(day=temp.day, month=temp.month, year=temp.year)
+        temp = datetime.strptime(data["ArrivalDate"], "%m/%d/%Y")
+        arrival = arrival.replace(day=temp.day, month=temp.month, year=temp.year)
 
         # Calculating the journey time
         hours = arrival.hour - departure.hour
@@ -38,10 +63,12 @@ def MakeGraph():
         seconds = arrival.second - departure.second
 
         time_of_flight = hours * 3600 + minutes * 60 + seconds
-        #
+
         graph[data["DepartureAirport"]].append(
             {
-                "ArrivalAirport": data["ArrivalAirport"],
+                "Origin": data["DepartureAirport"],
+                "Destination": data["ArrivalAirport"],
+                "InventoryID": data["InventoryId"],
                 "FlightNumber": data["FlightNumber"],
                 "Departure": departure,
                 "Arrival": arrival,
@@ -50,3 +77,5 @@ def MakeGraph():
         )
 
     return graph
+
+MakeGraph()
