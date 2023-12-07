@@ -5,40 +5,53 @@ Proceed with caution.
 '''
 
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-from qiskit.circuit.library import XGate
+from qiskit.circuit.library import XGate,MCXGate
 from qiskit.circuit import AncillaQubit,Qubit
 import numpy as np
+import remover
 
-de = 4
-ext = 2
-maxde = 10
+de = 4 # de = (K+B)*maxde (max no of bits)
+ext = 2 # used by remover
+delta = 6 # delta = max no of edges
+maxde = 10 # maximum depth
 count = 0
-K = int(np.log2(de+1))
+K = int(np.ceil(np.log2(delta+1))) # Getting no of bits required to represent delta+1, K = ceil(log2(delta + 1))
+qK = QuantumRegister(K) # branching qubits
+rem = QuantumRegister(ext) # required for remover
+orc = QuantumRegister(2) # required for oracle
+B = QuantumRegister(3) # represents the actual value
+removeCircuit = remover.createRemoverCircuits(de,ext,delta,K) # list of remove circuits
 
 def init():
-    start = QuantumRegister(K+ext)
-    qc = QuantumCircuit(start)
-    qc.x(0)
-    for i in start:
+    qc = QuantumCircuit(rem,orc,K,B)
+    qc.x(rem.size+orc.size)
+    for i in K: # O(K)
+        qc.h(i)
+    for i in B: # O(B)
         qc.h(i)
     return qc
 
-def calc(qc):
-    oracle(qc)
-    edge = 2
-    for i in range(1, de - 1 - edges):
-        qc.append(rem(qc,i),list(range(qc.num_qubits)))
-    q = QuantumCircuit(qc.num_qubits+K).compose(qc,list(range(qc.num_qubits)))
-    count+=1
-    for i in range(qc.num_qubits,q.num_qubits):
+def calc(qc): # 1 iteration - O(maxde*(de+K+?))
+    oracle(qc) # O(?)
+    for i in range(1, de - 1 - delta): # O(de - delta)
+        qc.append(removeCircuit[i],list(range(qc.num_qubits)))
+    q = QuantumCircuit(qc.num_qubits+K.size+B.size).compose(qc,list(range(qc.num_qubits)))
+    # Reassign remover circuit
+    # count+=1
+    for i in range(qc.num_qubits,qc.num_qubits+K.size): # O(K)
         q.h(i)
+    '''
+    for i in range(delta):
+        qc.append(MCXGate(K,(2,3)),target = removeCircuit[i])
+    '''
     calc(q)
 
-def oracle(qc):
+def oracle(qc): # check the qc if in target state (yes, then remove all), get current node edges
     if(qc in target_conditions): # target conditions left to figure out
-        #X = no of edges of current node left to figure out
-        n = node(qc.num_qubits)
-        qc.append(rem(qc,K-X),qc.num_qubits)
+        v = rem.size + orc.size + ((qc.num_qubits - rem.size - orc.size)//(qK.size+B.size) -1)*(qK.size+B.size)-1
+        n = node(v) # given the qubits of B, return the corresponding vertex
+        X = # no of edges of current node left to figure out, get edges from n
+        qc.append(removeCircuit[K-X],qc.num_qubits) #
 
 def checker(i):
     ck = QuantumCircuit(K+1)
@@ -50,8 +63,8 @@ def checker(i):
     return ck.to_gate()
 
 
-def node(n):
-    anc = QuantumRegister(1)
+def node(n): # get the value of the last B register
+    anc = ClassicalRegister(1)
     w = QuantumRegister(n)
     nc = QuantumCircuit(w + 1, anc)
     nc.reset(n)
@@ -65,6 +78,7 @@ def node(n):
             with nc.if_test((anc[0], 1)):
 
     with else_:
+
 
 qc = init()
 # calc(qc)
