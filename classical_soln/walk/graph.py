@@ -12,7 +12,7 @@ def PrintGraph(graph):
 def MakeGraph():
 
     flight_time_map = dict()
-    df = pd.read_csv('schedule.csv')
+    df = pd.read_csv('../database/schedule.csv')
 
     for i in range(0, len(df)):
 
@@ -30,7 +30,7 @@ def MakeGraph():
         )
 
     graph = dict()
-    df = pd.read_csv('INV.csv')
+    df = pd.read_csv('../database/inv.csv')
 
     for i in range(0, len(df)):
 

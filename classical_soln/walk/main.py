@@ -3,7 +3,6 @@
 # following code to have more parameters
 import time
 from dfs import AllPaths
-from dfs import PrintPaths
 from graph import MakeGraph
 from graph import PrintGraph
 
