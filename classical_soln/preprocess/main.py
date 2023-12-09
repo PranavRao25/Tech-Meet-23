@@ -7,6 +7,8 @@ import pandas as pd
 Delayed_Flights = {}
 Cancelled_Inventory = set()
 Cancelled_Flights = {}
+passenger_flight_map = {}
+affected_passengers = []
 
 for disruption in Disruptions:
 
@@ -36,3 +38,15 @@ for disruption in Disruptions:
             else:
 
                 continue
+
+        df = pd.read_csv('../database/passengers.csv')
+
+        for i in range(len(df)):
+            data = df.loc[i]
+            if (data["Flight Number"] == disruption["Flight Number"]):
+                affected_passengers.append(data)
+            else:
+                continue
+
+        passenger_flight_map[disruption["Flight Number"]] = affected_passengers
+        affected_passengers = []
