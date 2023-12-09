@@ -40,11 +40,12 @@ UPGRADE_CLASS_MAP = {
 class PNR:
     def __init__(self):
 
+        self.Recloc = None
         self.TYPE = None
         self.SSR = None
         self.Cabin = None
         self.Class = None
-        self.Number_Of_Down_lineConnections = None
+        self.Number_Of_Down_lineConnections = 0
         self.PaidServices = None
         self.Booked_As = None
         self.Number_of_PAX = None

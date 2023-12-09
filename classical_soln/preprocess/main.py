@@ -1,52 +1,44 @@
 # { input = database }, { output = identified affected flights & passengers }
 
+import pandas as pd
 from disruptions import *
 from ruleEngine import *
-import pandas as pd
 
-Delayed_Flights = {}
 Cancelled_Inventory = set()
-Cancelled_Flights = {}
-passenger_flight_map = {}
-affected_passengers = []
+Affected_Cities = []
+Affected_Passengers = {}
 
 for disruption in Disruptions:
 
-    if disruption["Type"] == "Cancelled":
+    df = pd.read_csv('../database/inv.csv')
+    print(df.keys())
 
-        if disruption["Flight Number"] not in Cancelled_Flights:
-            Cancelled_Flights[disruption["Flight Number"]] = {}
+    for i in range(0, len(df)):
 
-        df = pd.read_csv('../database/inv.csv')
+        flight = df.loc[i]
 
-        for i in range(0, len(df)):
+        if flight["FlightNumber"] == disruption["Flight Number"] and flight["DepartureDate"] == disruption["Date"]:
 
-            data = df.loc[i]
+            # This is to use in graph.py to avoid using this as an edge
+            Cancelled_Inventory.add(flight["InventoryId"])
 
-            if data["Flight Number"] == disruption["Flight Number"]:
+            t = (flight["DepartureAirport"], flight["ArrivalAirport"])
 
-                if data["Departure Date"] == disruption["Date"]:
+            # This will be given as input to walk module
+            Affected_Cities.append(t)
 
-                    Cancelled_Inventory.add(data["InventoryId"])
-                    # This is to use in graph.py to avoid using this as an edge
-
-                    # TODO: Decide how to store the identified flight & then identify the passengers
-
+            # This will be given as input to post process module
+            Affected_Passengers[t] = []
+            df1 = pd.read_csv('../database/pnr.csv')
+            for j in range(len(df1)):
+                pnr = df1.loc[j]
+                if pnr["FLT_NUM"] == flight["FlightNumber"] and pnr["DEP_DT"] == flight["DepartureDate"]:
+                    obj = PNR()
+                    obj.Recloc = pnr["RECLOC"]
+                    obj.TYPE = "PNR.INDIVIDUAL"
+                    obj.Number_of_PAX = pnr["PAX_CNT"]
+                    if pnr["PAX_CNT"] > 1:
+                        obj.Booked_As = "Group"
+                    Affected_Passengers[t].append(obj)
                 else:
-
                     continue
-            else:
-
-                continue
-
-        df = pd.read_csv('../database/passengers.csv')
-
-        for i in range(len(df)):
-            data = df.loc[i]
-            if (data["Flight Number"] == disruption["Flight Number"]):
-                affected_passengers.append(data)
-            else:
-                continue
-
-        passenger_flight_map[disruption["Flight Number"]] = affected_passengers
-        affected_passengers = []
