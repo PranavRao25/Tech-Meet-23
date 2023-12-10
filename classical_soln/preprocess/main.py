@@ -1,52 +1,73 @@
 # { input = database }, { output = identified affected flights & passengers }
+import sqlite3
 
-from disruptions import *
-from ruleEngine import *
-import pandas as pd
+conn = sqlite3.connect('../database/data_models.db')
+cursor = conn.cursor()
 
-Delayed_Flights = {}
-Cancelled_Inventory = set()
-Cancelled_Flights = {}
-passenger_flight_map = {}
-affected_passengers = []
+Disruptions = [
+    {
+        "FlightNumber": 2008,
+        "Date": '12/17/2023',
+        "Type": "Cancelled",
+    },
+    # {
+    #     "FlightNumber": ,
+    #     "Type": "Delayed",
+    # }
+]
 
 for disruption in Disruptions:
 
     if disruption["Type"] == "Cancelled":
 
-        if disruption["Flight Number"] not in Cancelled_Flights:
-            Cancelled_Flights[disruption["Flight Number"]] = {}
+        select_data_query = '''
+        SELECT * FROM flight
+        WHERE (FlightNumber = ? and DepartureDate = ?)
+        '''
 
-        df = pd.read_csv('../database/inv.csv')
+        # Execute the select query
+        cursor.execute(select_data_query, (disruption["FlightNumber"], disruption["Date"]))
 
-        for i in range(0, len(df)):
+        flight = cursor.fetchall()[0]
 
-            data = df.loc[i]
+        print(flight)
+        print(flight[6], flight[7])
 
-            if data["Flight Number"] == disruption["Flight Number"]:
+        update_data_query = '''
+        INSERT INTO  affected_cities (source, destination)
+        VALUES (?,?);
+        '''
 
-                if data["Departure Date"] == disruption["Date"]:
+        # Execute the select query
+        cursor.execute(update_data_query, (row[6], row[7]))
 
-                    Cancelled_Inventory.add(data["InventoryId"])
-                    # This is to use in graph.py to avoid using this as an edge
+        # Commit changes to the database
+        conn.commit()
 
-                    # TODO: Decide how to store the identified flight & then identify the passengers
+        select_data_query = '''
+        SELECT * FROM pnr_booking
+        WHERE (FLT_NUM = ? and DEP_DT = ?)
+        '''
 
-                else:
+        # Execute the select query
+        cursor.execute(select_data_query, (disruption["FlightNumber"], disruption["Date"]))
 
-                    continue
-            else:
+        affected_pnrs = cursor.fetchall()
 
-                continue
+        for pnr in affected_pnrs:
 
-        df = pd.read_csv('../database/passengers.csv')
+            print(pnr)
 
-        for i in range(len(df)):
-            data = df.loc[i]
-            if (data["Flight Number"] == disruption["Flight Number"]):
-                affected_passengers.append(data)
-            else:
-                continue
+            update_data_query = '''
+            INSERT INTO  affected_pnr 
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+            '''
 
-        passenger_flight_map[disruption["Flight Number"]] = affected_passengers
-        affected_passengers = []
+            # Execute the select query
+            cursor.execute(update_data_query,pnr)
+
+            # Commit changes to the database
+            conn.commit()
+
+# Close the connection
+conn.close()
