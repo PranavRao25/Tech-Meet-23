@@ -1,4 +1,4 @@
-<h4>Quadratic Unconstrained Binary Optimisation</h4>
+ <h4>Quadratic Unconstrained Binary Optimisation</h4>
 Input - $x \in \{0,1\}^{n}$
 Matrix $Q$ is Upper triangular. ($Q \in \mathbf{R}^{n\times n}$)
 
@@ -25,7 +25,7 @@ $Ax = b,x \in \{0,1\}$
 1. We assume $A,b$ both have only integer components
 2. For inequality constraints, we add slack variables
 3. Convert $Ax = b$ into quadratic penalties
-	1. ($P(Ax = b)^{T}(Ax = b)$)
+	1. $P(Ax = b)^{T}(Ax = b)$
 	2. $x_{1}+x_{2} \leq 1 \equiv P(x_{1}x_{2})$
 4. Choose $P$ suitably.
 5. Add them to the objective function
@@ -55,7 +55,7 @@ Objective Function:
 $\min\limits_{\sigma} H(\sigma) = \sum\limits_{i,j} w(e_{ij})\sigma_{i}\sigma_{j} + \mu\sum\limits_{j}h_{j}\sigma_{j}$ 
 
 Same as QUBO (A Quantum technique to solve it, at least physically)
-
+	
 <h4>Adiabatic Quantum Optimisation</h4>
 NP-Hard
 To find the minimum soln for a Hamiltonian $H_p$
