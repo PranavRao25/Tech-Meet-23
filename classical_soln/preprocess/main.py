@@ -1,44 +1,73 @@
 # { input = database }, { output = identified affected flights & passengers }
+import sqlite3
 
-import pandas as pd
-from disruptions import *
-from ruleEngine import *
+conn = sqlite3.connect('../database/data_models.db')
+cursor = conn.cursor()
 
-Cancelled_Inventory = set()
-Affected_Cities = []
-Affected_Passengers = {}
+Disruptions = [
+    {
+        "FlightNumber": 2008,
+        "Date": '12/17/2023',
+        "Type": "Cancelled",
+    },
+    # {
+    #     "FlightNumber": ,
+    #     "Type": "Delayed",
+    # }
+]
 
 for disruption in Disruptions:
 
-    df = pd.read_csv('../database/inv.csv')
-    print(df.keys())
+    if disruption["Type"] == "Cancelled":
 
-    for i in range(0, len(df)):
+        select_data_query = '''
+        SELECT * FROM flight
+        WHERE (FlightNumber = ? and DepartureDate = ?)
+        '''
 
-        flight = df.loc[i]
+        # Execute the select query
+        cursor.execute(select_data_query, (disruption["FlightNumber"], disruption["Date"]))
 
-        if flight["FlightNumber"] == disruption["Flight Number"] and flight["DepartureDate"] == disruption["Date"]:
+        flight = cursor.fetchall()[0]
 
-            # This is to use in graph.py to avoid using this as an edge
-            Cancelled_Inventory.add(flight["InventoryId"])
+        print(flight)
+        print(flight[6], flight[7])
 
-            t = (flight["DepartureAirport"], flight["ArrivalAirport"])
+        update_data_query = '''
+        INSERT INTO  affected_cities (source, destination)
+        VALUES (?,?);
+        '''
 
-            # This will be given as input to walk module
-            Affected_Cities.append(t)
+        # Execute the select query
+        cursor.execute(update_data_query, (row[6], row[7]))
 
-            # This will be given as input to post process module
-            Affected_Passengers[t] = []
-            df1 = pd.read_csv('../database/pnr.csv')
-            for j in range(len(df1)):
-                pnr = df1.loc[j]
-                if pnr["FLT_NUM"] == flight["FlightNumber"] and pnr["DEP_DT"] == flight["DepartureDate"]:
-                    obj = PNR()
-                    obj.Recloc = pnr["RECLOC"]
-                    obj.TYPE = "PNR.INDIVIDUAL"
-                    obj.Number_of_PAX = pnr["PAX_CNT"]
-                    if pnr["PAX_CNT"] > 1:
-                        obj.Booked_As = "Group"
-                    Affected_Passengers[t].append(obj)
-                else:
-                    continue
+        # Commit changes to the database
+        conn.commit()
+
+        select_data_query = '''
+        SELECT * FROM pnr_booking
+        WHERE (FLT_NUM = ? and DEP_DT = ?)
+        '''
+
+        # Execute the select query
+        cursor.execute(select_data_query, (disruption["FlightNumber"], disruption["Date"]))
+
+        affected_pnrs = cursor.fetchall()
+
+        for pnr in affected_pnrs:
+
+            print(pnr)
+
+            update_data_query = '''
+            INSERT INTO  affected_pnr 
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+            '''
+
+            # Execute the select query
+            cursor.execute(update_data_query,pnr)
+
+            # Commit changes to the database
+            conn.commit()
+
+# Close the connection
+conn.close()
