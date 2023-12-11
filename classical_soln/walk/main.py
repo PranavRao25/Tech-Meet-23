@@ -3,30 +3,31 @@
 # following code to have more parameters
 import time
 from dfs import AllPaths
+from dfs import PrintPaths
 from graph import MakeGraph
 from graph import PrintGraph
 
 Graph = MakeGraph()
 PrintGraph(Graph)
-
 print("\n\n")
 
-Airports = Graph.keys()
-TotalTime = 0
+# Airports = Graph.keys()
+# TotalTime = 0
+# for source in Airports:
+#
+#     for destination in Airports:
+#
+#         if source != destination:
+#
+#             start_time = time.time()  # Record the start time
+#             paths = AllPaths(Graph, source, destination)
+#             end_time = time.time()  # Record the end time
+#
+#             print(f"Paths from {source} to {destination}:")
+#             # PrintPaths(paths)
+#             print(f"Time taken: {end_time - start_time} seconds")
+#             TotalTime += end_time-start_time
+# print(TotalTime)
 
-for source in Airports:
-
-    for destination in Airports:
-
-        if source != destination:
-
-            start_time = time.time()  # Record the start time
-            paths = AllPaths(Graph, source, destination)
-            end_time = time.time()  # Record the end time
-
-            print(f"Paths from {source} to {destination}:")
-            # PrintPaths(paths)
-            print(f"Time taken: {end_time - start_time} seconds")
-            TotalTime += end_time-start_time
-
-print(TotalTime)
+paths = AllPaths(Graph, 'GAU', 'LKO')
+PrintPaths(paths)

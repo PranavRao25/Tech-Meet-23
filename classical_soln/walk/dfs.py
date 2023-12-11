@@ -18,11 +18,11 @@ def dfs(g, start_edge, end, path, paths):
         path.pop()
         return
 
-    if start_edge["ArrivalAirport"] == end:
+    if start_edge["Destination"] == end:
         paths.append(path.copy())
     else:
-        if start_edge["ArrivalAirport"] in g:
-            for next_edge in g[start_edge["ArrivalAirport"]]:
+        if start_edge["Destination"] in g:
+            for next_edge in g[start_edge["Destination"]]:
                 if next_edge not in path:
                     # if TimeDelay(start_edge, next_edge):
                     #     dfs(g, next_edge, end, path, paths)
@@ -46,7 +46,7 @@ def PrintPaths(paths):
         for node in path:
             print()
             print(
-                f'\tArrivalAirport : {node["ArrivalAirport"]}\n\tFlightNumber: {node["FlightNumber"]}\n\tDeparture time from source : {node["Departure"]}\n\tArrival time at destination : {node["Arrival"]}')
+                f'\tOrigin: {node["Origin"]}\n\tDestination: {node["Destination"]}\n\tFlightNumber: {node["FlightNumber"]}\n')
             print()
 
         print()
