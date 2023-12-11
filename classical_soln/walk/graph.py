@@ -30,7 +30,7 @@ def MakeGraph():
         )
 
     graph = dict()
-    df = pd.read_csv('../database/inv.csv')
+    df = pd.read_csv('../database/INV.csv')
 
     for i in range(0, len(df)):
 
