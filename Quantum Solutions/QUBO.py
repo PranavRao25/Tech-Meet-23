@@ -15,6 +15,7 @@ class QuantumSolver:
     length = len(df.columns)
     Q = np.zeros((length,length))
     A,B,N,G=np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q) # all matrices
+
     highval = 9223372036854775807 # used for G (neglecting some flights)
     startNode, endNode="", "" # indices of the inventory dataset
     inv_id:str
@@ -66,8 +67,8 @@ class QuantumSolver:
         for i in range(len(self.df)):
             data = self.df.loc[i]
 
-            if data["FlightNumber"] not in self.graph:
-                self.graph[data["FlightNumber"]] = (
+            if data["InventoryId"] not in self.graph:
+                self.graph[data["InventoryId"]] = (
                     data["DepartureAirport"],
                     data["ArrivalAirport"],
                     data["DepartureDate"],
@@ -76,59 +77,66 @@ class QuantumSolver:
                     data["ArrivalDate"]
                 )
 
-                self.Q[i,i] = self.__diff(data["DepartureDates"],data["DepartureTime"],data["ArrivalDate"],data["ArrivalTime"])
-                self.A[i,i] = 1 if(data["DepartureAirport"]==startNode) else 0
-                self.B[i, i] = 1 if (data["ArrivalAirport"] == endNode) else 0
-
-        # Edges
-        for i in range(len(self.df)):
-            fl1 = self.df.loc[i]
-            if fl1["DepartureAirport"]==startNode:
-                self.N[i,i]=1
-            for j in range(len(self.df)):
-                fl2 = self.df.loc[j]
-                if fl1==fl2:
-                    continue
+                self.Q[i,i] = self.__diff(data["DepartureDate"], data["ArrivalDate"], data["DepartureTime"], data["ArrivalTime"])
+                if data["DepartureAirport"] == self.flight["DepartureAirport"][0]:
+                    self.A[i, i] = 1
+                    self.N[i, i] = 1
                 else:
-                    if fl1["DepartureAirport"]==fl2["ArrivalAirport"]:
-                        self.N[i, j] = 1
-                        self.G[i,j] = self.__diff(fl2["DepartureDate"],fl2["DepartureTime"],fl1["ArrivalDate"],fl1["ArrivalTime"]) # minutes(fl2["DepartureTime"]) - minutes(fl1["ArrivalTime"])
-                        if self.G[i,j]<60 or self.G[i,j]>720:
-                            self.G[i,j]=self.highval
-                            self.N[i,j]=0
+                    self.A[i, i] = 0
+                self.B[i, i] = 1 if (data["ArrivalAirport"] == self.flight["ArrivalAirport"][0]) else 0
+
+            # Edges
+                for j in range(len(self.df)):
+                    fl2 = self.df.loc[j]
+                    if data["InventoryId"] == fl2["InventoryId"]:
+                        continue
                     else:
-                        self.N[i,j]=0
-                        self.G[i,j]=self.highval
+                        if data["DepartureAirport"] == fl2["ArrivalAirport"]:
+                            self.N[i, j] = 1
+                            self.G[i,j] = self.__diff(fl2["DepartureDate"],data["ArrivalDate"],fl2["DepartureTime"],data["ArrivalTime"]) # minutes(fl2["DepartureTime"]) - minutes(data["ArrivalTime"])
+                            if self.G[i,j]<60 or self.G[i,j]>720:
+                                self.G[i,j]=self.highval
+                                self.N[i,j]=0
+                        else:
+                            self.N[i,j]=0
+                            self.G[i,j]=self.highval
 
 
     def quantumSolve(self) ->list:
         total = []
-        self.__run(self.startNode,self.endNode) # we will get the Q A B N G matrices initialised now
+        self.__run(self.flight["DepartureAirport"],self.flight["ArrivalAirport"]) # we will get the Q A B N G matrices initialised now
+        qp = QuadraticProgram("flights")
+        F = self.Q + self.A + self.B + self.N + self.G # quadratic form matrix
+        L = -2*(self.A.diagonal() + self.B.diagonal())  # linear matrix
+        # L = np.reshape(L,(1,self.A.shape[0]))[0]
+        qp.minimize(linear=L)  # quadratic=F) # matrices fed into the quadratic program
+        return qp
 
-        for i in range(3): # 5 alternate solutions
-            # Convert into a Quadratic Program
-            qp = QuadraticProgram("flights")
-            F = self.Q + self.A + self.B + self.N + self.G # quadratic form matrix
-            L = -2*(self.A + self.B)  # linear matrix
+#             qp.minimize(constant=3,linear=L.diagonal(),quadratic=F) # matrices fed into the quadratic program
+#         for i in range(3): # 5 alternate solutions
+#             # Convert into a Quadratic Program
+#             qp = QuadraticProgram("flights")
+#             F = self.Q + self.A + self.B + self.N + self.G # quadratic form matrix
+#             L = -2*(self.A + self.B)  # linear matrix
 
-            qp.minimize(constant=3,linear=L.diagonal(),quadratic=F) # matrices fed into the quadratic program
-            # Quantum processing
+#             qp.minimize(constant=3,linear=L.diagonal(),quadratic=F) # matrices fed into the quadratic program
+#             # Quantum processing
 
-            """
-                To be explored, different optimizers, eigensolvers, (ansatz : best is linear entanglement)
-            """
+#             """
+#                 To be explored, different optimizers, eigensolvers, (ansatz : best is linear entanglement)
+#             """
 
-            # qubitOp, offset = qp.to_ising()  # conversion into Ising Problem
-            two = TwoLocal(3, 'rx', 'cx', 'linear', reps=2, insert_barriers=True)  # an ansatz circuit
-            optimizer = SPSA(maxiter=3000) # try other optimizers
-            vqe = SamplingVQE(sampler=Sampler(), ansatz=two, optimizer=optimizer)
-            vqe_op1 = MinimumEigenOptimizer(vqe)
-            result = vqe_op1.solve(qp)
-            ans = list(result.variables_dict.values())
+#             # qubitOp, offset = qp.to_ising()  # conversion into Ising Problem
+#             two = TwoLocal(27, 'rx', 'cx', 'linear', reps=2, insert_barriers=True)  # an ansatz circuit
+#             optimizer = SPSA(maxiter=3000) # try other optimizers
+#             vqe = SamplingVQE(sampler=Sampler(), ansatz=two, optimizer=optimizer)
+#             vqe_op1 = MinimumEigenOptimizer(vqe)
+#             result = vqe_op1.solve(qp)
+#             ans = list(result.variables_dict.values())
 
-            # total.append(postProcess(ans))
-            total.append(self.__postProcess(ans))
-        return total
+#             # total.append(postProcess(ans))
+#             total.append(self.__postProcess(ans))
+#         return total
 
 
     def __postProcess(self,bitString:list) -> list:
