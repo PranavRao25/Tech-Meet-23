@@ -1,4 +1,4 @@
-from database import INV.csv
+# from database import INV.csv
 import pandas as pd
 from qiskit_optimization.applications import *
 from qiskit.circuit.library import TwoLocal
@@ -10,26 +10,32 @@ from qiskit_optimization.algorithms import MinimumEigenOptimizer
 from qiskit_algorithms.optimizers import SPSA
 from qiskit.primitives import Sampler
 
-"""
-5 matrices : Q A B N G
-
-Use Inventory and Schedule Dataset
-"""
-
-def diff(date1,date2,time1,time2):
-    dt1=dt.datetime.strptime(date1+" "+time1,"%d/%m/%Y %H:%M")
-    dt2=dt.datetime.strptime(date2+" "+time2,'%d/%m/%Y %H:%M')
-    difference=dt2-dt1
-    return int(difference.total_seconds()//60)
-
 class QuantumSolver:
-    df = pd.read_csv(#INV.csv)
+    df = pd.read_csv("/home/pranav/QC/Tech Meet/INV_sample.csv") #INV.csv
     length = len(df.columns)
-    Q,A,B,N,G = np.zeros((length,length)),np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q)
-    highval = 9223372036854775807
-    startNode,endNode=0,0
+    Q,A,B,N,G = np.zeros((length,length)),np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q) # all matrices
+    highval = 9223372036854775807 # used for G (neglecting some flights)
+    startNode, endNode="", "" # indices of the inventory dataset
 
-    def __init(self,startNode,endNode):
+    def __init__(self,inv_id):
+        self.startNode,self.endNode = start,end
+
+    def __diff(self,date1, date2, time1, time2):
+        dt1 = dt.datetime.strptime(date1 + " " + time1, "%d/%m/%Y %H:%M")
+        dt2 = dt.datetime.strptime(date2 + " " + time2, '%d/%m/%Y %H:%M')
+        difference = dt2 - dt1
+        return int(difference.total_seconds() // 60)
+
+
+    def __preProcess(self):
+        start = self.df.loc[self.startNode]
+        end = self.df.loc[self.endNode]
+
+        for i in range(len(self.df)):
+            data = self.df.loc[i]
+            ti = self.__diff(start["DepartureDates"],data["DepartureTime"],data["ArrivalDate"],data["ArrivalTime"])
+
+    def __run(self,startNode,endNode):
         self.graph = dict()
 
         # Nodes
@@ -47,10 +53,9 @@ class QuantumSolver:
                     data["ArrivalDate"]
                 )
 
-                self.Q[i,i] = diff(data["DepartureDates"],data["DepartureTime"],data["ArrivalDate"],data["ArrivalTime"])
+                self.Q[i,i] = self.__diff(data["DepartureDates"],data["DepartureTime"],data["ArrivalDate"],data["ArrivalTime"])
                 self.A[i,i] = 1 if(data["DepartureAirport"]==startNode) else 0
                 self.B[i, i] = 1 if (data["ArrivalAirport"] == endNode) else 0
-
 
         # Edges
         for i in range(len(self.df)):
@@ -75,17 +80,17 @@ class QuantumSolver:
 
     def quantumSolve(self) ->list:
         total = []
-        self.__init(self.startNode,self.endNode) # we will get the Q A B N G matrices initialised now
+        self.__run(self.startNode,self.endNode) # we will get the Q A B N G matrices initialised now
 
-        for i in range(5): # 5 alternate solutions
+        for i in range(3): # 5 alternate solutions
             # Convert into a Quadratic Program
             qp = QuadraticProgram("flights")
-            # process the matrices into this program using numpy
             F = self.Q + self.A + self.B + self.N + self.G # quadratic form matrix
             L = -2*(self.A + self.B)  # linear matrix
 
             qp.minimize(constant=3,linear=L.diagonal(),quadratic=F) # matrices fed into the quadratic program
             # Quantum processing
+
             """
                 To be explored, different optimizers, eigensolvers, (ansatz : best is linear entanglement)
             """
