@@ -5,6 +5,7 @@ from qiskit.circuit.library import TwoLocal
 import numpy as np
 import datetime as dt
 from qiskit_optimization import QuadraticProgram
+from qiskit_optimization.converters import QuadraticProgramToQubo
 from qiskit_algorithms.minimum_eigensolvers import SamplingVQE,VQE,SamplingMinimumEigensolver
 from qiskit_optimization.algorithms import MinimumEigenOptimizer
 from qiskit_algorithms.optimizers import SPSA
@@ -14,7 +15,7 @@ class QuantumSolver:
     df = pd.read_csv(".\INV.csv") #INV.csv
     
 
-    highval = 9223372036854775807 # used for G (neglecting some flights)
+    highval = 100000 # used for G (neglecting some flights)
     startNode, endNode="", "" # indices of the inventory dataset
     inv_id:str
     flight=None
@@ -25,11 +26,17 @@ class QuantumSolver:
         startTime=dt.datetime.now()
         self.inv_id=inv_id
         self.lst=self.__preProcess()
+        print(len(self.lst),"Total Flights:\n")
+        for i in self.lst:
+            print(i)
         self.length = len(self.lst)
         self.Q = np.zeros((self.length,self.length))
         self.A,self.B,self.N,self.G=np.zeros_like(self.Q),np.zeros_like(self.Q),np.zeros_like(self.Q),np.zeros_like(self.Q) # all matrices
 
-        self.quantumSolve()
+        print("\nAffected Flight\n")
+        print(self.flight)
+        ans=self.quantumSolve()
+        print(ans)
 
         print((dt.datetime.now()-startTime))
 
@@ -55,8 +62,11 @@ class QuantumSolver:
 
         for i in range(len(self.df)):
             data = self.df.loc[i]
+            if index==i:
+                continue
             ti = self.__diff(date1=flight["DepartureDate"],time1=flight["DepartureTime"],date2=data["ArrivalDate"],time2=data["ArrivalTime"])
             ti2 = self.__diff(date1=flight["DepartureDate"],time1=flight["DepartureTime"],date2=data["DepartureDate"],time2=data["DepartureTime"])
+            # print(ti,ti2)
             if ti < 60 or ti2 > 72*60:
                 continue
             else:
@@ -84,38 +94,70 @@ class QuantumSolver:
 
                 self.Q[i,i] = self.__diff(data["DepartureDate"], data["DepartureTime"], data["ArrivalDate"], data["ArrivalTime"])
                 if data["DepartureAirport"] == self.flight["DepartureAirport"]:
-                    self.A[i, i] = 1
-                    self.N[i, i] = 1
+                    self.A[i, i] = self.highval
+                    self.N[i, i] = self.highval
                 else:
                     self.A[i, i] = 0
                 self.B[i, i] = 1 if (data["ArrivalAirport"] == self.flight["ArrivalAirport"][0]) else 0
 
             # Edges
-                for j in range(len(self.df)):
-                    fl2 = self.df.loc[j]
+                for j in range(len(self.lst)):
+                    fl2 = self.lst[j]
                     if data["InventoryId"] == fl2["InventoryId"]:
-                        continue
+                        ti= self.__diff(self.flight["DepartureDate"],self.flight["DepartureTime"],fl2["DepartureDate"],fl2["DepartureTime"])
+                        self.G[i,j]=ti
                     else:
                         if data["DepartureAirport"] == fl2["ArrivalAirport"]:
                             self.N[i, j] = 1
-                            self.G[i,j] = self.__diff(fl2["DepartureDate"],fl2["DepartureTime"],data["ArrivalDate"],data["ArrivalTime"]) # minutes(fl2["DepartureTime"]) - minutes(data["ArrivalTime"])
+                            if self.G[j,i]==0 or self.G[j,i]==self.highval:
+                                self.G[i,j] = self.__diff(fl2["DepartureDate"],fl2["DepartureTime"],data["ArrivalDate"],data["ArrivalTime"]) # minutes(fl2["DepartureTime"]) - minutes(data["ArrivalTime"])
                             if self.G[i,j]<60 or self.G[i,j]>720:
                                 self.G[i,j]=self.highval
                                 self.N[i,j]=0
+                            else:
+                                self.G[j,i]=0
                         else:
                             self.N[i,j]=0
                             self.G[i,j]=self.highval
 
+        print("Q:\n ",self.Q)
+        print("G:\n ",self.G)
+        print("A:\n ",self.A)
+        print("B:\n ",self.B)
+        print("N:\n ",self.N)
 
-    def quantumSolve(self):
+    def quantumSolve(self) -> list:
         total = []
         self.__run() # we will get the Q A B N G matrices initialised now
         qp = QuadraticProgram("flights")
         F = self.Q + self.A + self.B + self.N + self.G # quadratic form matrix
-        L = -2*(self.A.diagonal() + self.B.diagonal())  # linear matrix
+        F=F.astype(int)
+        L = -2*(self.A.diagonal() + self.B.diagonal()) - self.highval*(np.ones((self.A.shape[0],))) # linear matrix
+        L=L.astype(int)
+        print(L)
+        print(F)
         # L = np.reshape(L,(1,self.A.shape[0]))[0]
-        qp.minimize(linear=L)  # quadratic=F) # matrices fed into the quadratic program
-        return qp
+        qp.minimize(constant=3*self.highval,linear=L,quadratic=F) # matrices fed into the quadratic program
+        qp.binary_var_list(L.size)
+
+        # qp.
+
+        # qp.minimize(linear=L)  # quadratic=F) # matrices fed into the quadratic program        
+        # return qp
+        print(qp.objective)
+
+        qubitOp, offset = qp.to_ising()  # conversion into Ising Problem
+        two = TwoLocal(27, 'rx', 'cx', 'linear', reps=2, insert_barriers=True)  # an ansatz circuit
+        optimizer = SPSA(maxiter=3000) # try other optimizers
+        vqe = SamplingVQE(sampler=Sampler(), ansatz=two, optimizer=optimizer)
+        vqe_op1 = MinimumEigenOptimizer(vqe)
+        result = vqe_op1.solve(qp)
+        ans = list(result.variables_dict.values())
+
+        # total.append(postProcess(ans))
+        print(ans)
+        total.append(self.__postProcess(ans))
+        return total
 
 #             qp.minimize(constant=3,linear=L.diagonal(),quadratic=F) # matrices fed into the quadratic program
 #         for i in range(3): # 5 alternate solutions
@@ -156,4 +198,4 @@ class QuantumSolver:
         return flights
 
 
-QuantumSolver("INV-ZZ-8710804")
+QuantumSolver("INV-ZZ-1875559")
