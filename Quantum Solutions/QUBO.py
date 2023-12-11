@@ -36,6 +36,7 @@ class QuantumSolver:
         """
             returns difference in time of date2-date1
         """
+        print(date1,date2)
         dt1 = dt.datetime.strptime(date1 + " " + time1, "%m/%d/%Y %H:%M")
         dt2 = dt.datetime.strptime(date2 + " " + time2, '%m/%d/%Y %H:%M')
         difference = dt2 - dt1
@@ -45,13 +46,15 @@ class QuantumSolver:
     def __preProcess(self):
         # start = self.df.loc[self.startNode]
         # end = self.df.loc[self.endNode]
-        flight=self.df.loc[self.df["InventoryId"]==self.inv_id]
+        # flight=self.df.loc[self.df["InventoryId"]==self.inv_id]
+        index=self.df.loc[self.df["InventoryId"]==self.inv_id].index[0]
+        flight=self.df.loc[index]
         list_of_feasible_flights=[]
 
         for i in range(len(self.df)):
             data = self.df.loc[i]
-            ti = self.__diff(date1=flight["DepartureDate"][12],time1=flight["DepartureTime"][12],date2=data["ArrivalDate"],time2=data["ArrivalTime"])
-            ti2 = self.__diff(date1=flight["DepartureDate"][12],time1=flight["DepartureTime"][12],date2=data["DepartureDate"],time2=data["DepartureTime"])
+            ti = self.__diff(date1=flight["DepartureDate"],time1=flight["DepartureTime"],date2=data["ArrivalDate"],time2=data["ArrivalTime"])
+            ti2 = self.__diff(date1=flight["DepartureDate"],time1=flight["DepartureTime"],date2=data["DepartureDate"],time2=data["DepartureTime"])
             if ti < 60 or ti2 > 72*60:
                 continue
             else:
