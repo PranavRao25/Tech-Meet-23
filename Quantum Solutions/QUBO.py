@@ -3,6 +3,7 @@ import pandas as pd
 from qiskit_optimization.applications import *
 from qiskit.circuit.library import TwoLocal
 import numpy as np
+import datetime as dt
 from qiskit_optimization import QuadraticProgram
 from qiskit_algorithms.minimum_eigensolvers import SamplingVQE,VQE,SamplingMinimumEigensolver
 from qiskit_optimization.algorithms import MinimumEigenOptimizer
@@ -14,6 +15,13 @@ from qiskit.primitives import Sampler
 
 Use Inventory and Schedule Dataset
 """
+
+def diff(date1,date2,time1,time2):
+    dt1=dt.datetime.strptime(date1+" "+time1,"%d/%m/%Y %H:%M")
+    dt2=dt.datetime.strptime(date2+" "+time2,'%d/%m/%Y %H:%M')
+    difference=dt2-dt1
+    return int(difference.total_seconds()//60)
+
 class QuantumSolver:
     df = pd.read_csv(#INV.csv)
     length = len(df.columns)
