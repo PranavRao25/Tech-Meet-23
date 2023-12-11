@@ -39,7 +39,7 @@ for disruption in Disruptions:
         '''
 
         # Execute the select query
-        cursor.execute(update_data_query, (row[6], row[7]))
+        cursor.execute(update_data_query, (flight[6], flight[7]))
 
         # Commit changes to the database
         conn.commit()
