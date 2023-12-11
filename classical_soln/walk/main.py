@@ -6,6 +6,7 @@ from dfs import AllPaths
 from dfs import PrintPaths
 from graph import MakeGraph
 from graph import PrintGraph
+from datetime import datetime
 
 Graph = MakeGraph()
 PrintGraph(Graph)
@@ -29,5 +30,8 @@ print("\n\n")
 #             TotalTime += end_time-start_time
 # print(TotalTime)
 
-paths = AllPaths(Graph, 'GAU', 'LKO')
+Affeced_Flight_Departure = datetime.strptime("05/25/2024 4:37", "%m/%d/%Y %H:%M")
+Affected_Flight_Arrival = datetime.strptime("05/25/2024 12:50", "%m/%d/%Y %H:%M")
+
+paths = AllPaths(Graph, 'CNN', 'MAA', Affeced_Flight_Departure, Affected_Flight_Arrival)
 PrintPaths(paths)
