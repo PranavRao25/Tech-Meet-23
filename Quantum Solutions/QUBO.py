@@ -15,7 +15,7 @@ class QuantumSolver:
     df = pd.read_csv(".\INV.csv") #INV.csv
     
 
-    highval = 100000 # used for G (neglecting some flights)
+    highval = 1000000 # used for G (neglecting some flights)
     startNode, endNode="", "" # indices of the inventory dataset
     inv_id:str
     flight=None
@@ -63,6 +63,7 @@ class QuantumSolver:
         for i in range(len(self.df)):
             data = self.df.loc[i]
             if index==i:
+                print("pass")
                 continue
             ti = self.__diff(date1=flight["DepartureDate"],time1=flight["DepartureTime"],date2=data["ArrivalDate"],time2=data["ArrivalTime"])
             ti2 = self.__diff(date1=flight["DepartureDate"],time1=flight["DepartureTime"],date2=data["DepartureDate"],time2=data["DepartureTime"])
@@ -92,33 +93,35 @@ class QuantumSolver:
                     data["ArrivalDate"]
                 )
 
-                self.Q[i,i] = self.__diff(data["DepartureDate"], data["DepartureTime"], data["ArrivalDate"], data["ArrivalTime"])
+                self.Q[i,i] = self.__diff(data["DepartureDate"], data["DepartureTime"], data["ArrivalDate"], data["ArrivalTime"])*100
                 if data["DepartureAirport"] == self.flight["DepartureAirport"]:
-                    self.A[i, i] = self.highval
-                    self.N[i, i] = self.highval
+                    self.A[i, i] = 1
+                    self.N[i, i] = 1
+                    self.G[i,i]= self.__diff(self.flight["DepartureDate"],self.flight["DepartureTime"],data["DepartureDate"],data["DepartureTime"])*100
                 else:
                     self.A[i, i] = 0
-                self.B[i, i] = 1 if (data["ArrivalAirport"] == self.flight["ArrivalAirport"][0]) else 0
+                self.B[i, i] = 1 if (data["ArrivalAirport"] == self.flight["ArrivalAirport"]) else 0
 
             # Edges
                 for j in range(len(self.lst)):
                     fl2 = self.lst[j]
-                    if data["InventoryId"] == fl2["InventoryId"]:
-                        ti= self.__diff(self.flight["DepartureDate"],self.flight["DepartureTime"],fl2["DepartureDate"],fl2["DepartureTime"])
-                        self.G[i,j]=ti
+                    if self.N[i,i] == 1 and i!=j:
+                        self.G[i,j]=0
                     else:
-                        if data["DepartureAirport"] == fl2["ArrivalAirport"]:
-                            self.N[i, j] = 1
-                            if self.G[j,i]==0 or self.G[j,i]==self.highval:
-                                self.G[i,j] = self.__diff(fl2["DepartureDate"],fl2["DepartureTime"],data["ArrivalDate"],data["ArrivalTime"]) # minutes(fl2["DepartureTime"]) - minutes(data["ArrivalTime"])
-                            if self.G[i,j]<60 or self.G[i,j]>720:
-                                self.G[i,j]=self.highval
-                                self.N[i,j]=0
-                            else:
-                                self.G[j,i]=0
+                        if data["InventoryId"] == fl2["InventoryId"]:
+                            ti= self.__diff(self.flight["DepartureDate"],self.flight["DepartureTime"],fl2["DepartureDate"],fl2["DepartureTime"])*100
+                            self.G[i,j]=ti
                         else:
-                            self.N[i,j]=0
-                            self.G[i,j]=self.highval
+                            if data["DepartureAirport"] == fl2["ArrivalAirport"]:
+                                self.N[j,i] = 1
+                                ti = int(self.__diff(fl2["ArrivalDate"],fl2["ArrivalTime"],data["DepartureDate"],data["DepartureTime"])*100 )# minutes(fl2["DepartureTime"]) - minutes(data["ArrivalTime"])
+                                if ti <6000 or ti >72000 :
+                                    self.G[i,j]=self.highval
+                                else:
+                                    self.G[i,j]=ti
+                            else:
+                                self.N[j,i]=0
+                                self.G[i,j]=0
 
         print("Q:\n ",self.Q)
         print("G:\n ",self.G)
@@ -130,14 +133,19 @@ class QuantumSolver:
         total = []
         self.__run() # we will get the Q A B N G matrices initialised now
         qp = QuadraticProgram("flights")
-        F = self.Q + self.A + self.B + self.N + self.G # quadratic form matrix
+        F = self.Q + self.highval*(self.A + self.B - self.N) + self.G # quadratic form matrix
+        for i in range(self.length):
+            F=F+self.highval*np.matmul(np.reshape(self.N[:,i],(-1,1)),np.transpose(np.reshape(self.N[:,i],(-1,1))))
+            # print(i,self.N[:,i])
+            # print(np.matmul(np.reshape(self.N[:,i],(-1,1)),np.transpose(np.reshape(self.N[:,i],(-1,1)))))
         F=F.astype(int)
-        L = -2*(self.A.diagonal() + self.B.diagonal()) - self.highval*(np.ones((self.A.shape[0],))) # linear matrix
+        # L = -2*(self.A.diagonal() + self.B.diagonal()) - 2*self.highval*(np.ones((self.A.shape[0],))) # linear matrix
+        L = -2*self.highval*(self.A.diagonal() + self.B.diagonal())  # linear matrix
         L=L.astype(int)
         print(L)
         print(F)
         # L = np.reshape(L,(1,self.A.shape[0]))[0]
-        qp.minimize(constant=3*self.highval,linear=L,quadratic=F) # matrices fed into the quadratic program
+        qp.minimize(linear=L,quadratic=F) # matrices fed into the quadratic program
         qp.binary_var_list(L.size)
 
         # qp.
@@ -147,11 +155,20 @@ class QuantumSolver:
         print(qp.objective)
 
         qubitOp, offset = qp.to_ising()  # conversion into Ising Problem
-        two = TwoLocal(27, 'rx', 'cx', 'linear', reps=2, insert_barriers=True)  # an ansatz circuit
+        two = TwoLocal(self.length, 'rx', 'cx', 'linear', reps=2, insert_barriers=True)  # an ansatz circuit
+        start=dt.datetime.now()
         optimizer = SPSA(maxiter=3000) # try other optimizers
+        print(dt.datetime.now()-start)
+        start=dt.datetime.now()
         vqe = SamplingVQE(sampler=Sampler(), ansatz=two, optimizer=optimizer)
+        print(dt.datetime.now()-start)
+        start=dt.datetime.now()
         vqe_op1 = MinimumEigenOptimizer(vqe)
+        print(dt.datetime.now()-start)
+        start=dt.datetime.now()
         result = vqe_op1.solve(qp)
+        print(dt.datetime.now()-start)
+        start=dt.datetime.now()
         ans = list(result.variables_dict.values())
 
         # total.append(postProcess(ans))
@@ -190,7 +207,7 @@ class QuantumSolver:
         flights = []
         for i in range(len(bitString)):
             if bitString[i]==1:
-                flights.append(self.df.loc[i])
+                flights.append(self.lst[i])
         for i in range(len(flights)):
             for j in range(len(flights)):
                 if i!=j :
