@@ -12,7 +12,7 @@ from qiskit.primitives import Sampler
 
 
 class QuantumSolver:
-    df = pd.read_csv("/home/pranav/QC/Tech Meet/INV_sample.csv")  # INV.csv
+    df = pd.read_csv("../INV.csv")  # INV.csv
     length = len(df)
 
     highval = 9223372036854775807  # used for G (neglecting some flights)
