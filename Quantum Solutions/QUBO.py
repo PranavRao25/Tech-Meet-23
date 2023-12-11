@@ -11,29 +11,52 @@ from qiskit_algorithms.optimizers import SPSA
 from qiskit.primitives import Sampler
 
 class QuantumSolver:
-    df = pd.read_csv("/home/pranav/QC/Tech Meet/INV_sample.csv") #INV.csv
+    df = pd.read_csv(".\INV.csv") #INV.csv
     length = len(df.columns)
-    Q,A,B,N,G = np.zeros((length,length)),np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q) # all matrices
+    Q = np.zeros((length,length))
+    A,B,N,G=np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q) # all matrices
     highval = 9223372036854775807 # used for G (neglecting some flights)
     startNode, endNode="", "" # indices of the inventory dataset
+    inv_id:str
 
     def __init__(self,inv_id):
-        self.startNode,self.endNode = start,end
+        # self.startNode,self.endNode = start,end
+        startTime=dt.datetime.now()
+        self.inv_id=inv_id
+        lst=self.__preProcess()
+        for i in lst:
+            print(i,end="\n\n")
 
-    def __diff(self,date1, date2, time1, time2):
-        dt1 = dt.datetime.strptime(date1 + " " + time1, "%d/%m/%Y %H:%M")
-        dt2 = dt.datetime.strptime(date2 + " " + time2, '%d/%m/%Y %H:%M')
+        print(len(lst))
+        print((dt.datetime.now()-startTime))
+
+    
+    def __diff(self,date1, time1, date2, time2):
+        """
+            returns difference in time of date2-date1
+        """
+        dt1 = dt.datetime.strptime(date1 + " " + time1, "%m/%d/%Y %H:%M")
+        dt2 = dt.datetime.strptime(date2 + " " + time2, '%m/%d/%Y %H:%M')
         difference = dt2 - dt1
         return int(difference.total_seconds() // 60)
 
 
     def __preProcess(self):
-        start = self.df.loc[self.startNode]
-        end = self.df.loc[self.endNode]
+        # start = self.df.loc[self.startNode]
+        # end = self.df.loc[self.endNode]
+        flight=self.df.loc[self.df["InventoryId"]==self.inv_id]
+        list_of_feasible_flights=[]
 
         for i in range(len(self.df)):
             data = self.df.loc[i]
-            ti = self.__diff(start["DepartureDates"],data["DepartureTime"],data["ArrivalDate"],data["ArrivalTime"])
+            ti = self.__diff(date1=flight["DepartureDate"][12],time1=flight["DepartureTime"][12],date2=data["ArrivalDate"],time2=data["ArrivalTime"])
+            ti2 = self.__diff(date1=flight["DepartureDate"][12],time1=flight["DepartureTime"][12],date2=data["DepartureDate"],time2=data["DepartureTime"])
+            if ti < 60 or ti2 > 72*60:
+                continue
+            else:
+                list_of_feasible_flights.append(data)
+            
+        return list_of_feasible_flights
 
     def __run(self,startNode,endNode):
         self.graph = dict()
@@ -69,7 +92,7 @@ class QuantumSolver:
                 else:
                     if fl1["DepartureAirport"]==fl2["ArrivalAirport"]:
                         self.N[i, j] = 1
-                        self.G[i,j] = diff(fl2["DepartureDates"],fl2["DepartureTime"],fl1["ArrivalDate"],fl1["ArrivalTime"]) # minutes(fl2["DepartureTime"]) - minutes(fl1["ArrivalTime"])
+                        self.G[i,j] = self.__diff(fl2["DepartureDate"],fl2["DepartureTime"],fl1["ArrivalDate"],fl1["ArrivalTime"]) # minutes(fl2["DepartureTime"]) - minutes(fl1["ArrivalTime"])
                         if self.G[i,j]<60 or self.G[i,j]>720:
                             self.G[i,j]=self.highval
                             self.N[i,j]=0
@@ -118,3 +141,6 @@ class QuantumSolver:
                 if i!=j :
                     self.Q[i,j]=self.highval
         return flights
+
+
+QuantumSolver("INV-ZZ-8710804")
