@@ -12,23 +12,25 @@ from qiskit.primitives import Sampler
 
 class QuantumSolver:
     df = pd.read_csv(".\INV.csv") #INV.csv
-    length = len(df.columns)
-    Q = np.zeros((length,length))
-    A,B,N,G=np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q),np.zeros_like(Q) # all matrices
+    
 
     highval = 9223372036854775807 # used for G (neglecting some flights)
     startNode, endNode="", "" # indices of the inventory dataset
     inv_id:str
+    flight=None
+    Q=A=B=N=G=None
 
     def __init__(self,inv_id):
         # self.startNode,self.endNode = start,end
         startTime=dt.datetime.now()
         self.inv_id=inv_id
-        lst=self.__preProcess()
-        for i in lst:
-            print(i,end="\n\n")
+        self.lst=self.__preProcess()
+        self.length = len(self.lst)
+        self.Q = np.zeros((self.length,self.length))
+        self.A,self.B,self.N,self.G=np.zeros_like(self.Q),np.zeros_like(self.Q),np.zeros_like(self.Q),np.zeros_like(self.Q) # all matrices
 
-        print(len(lst))
+        self.quantumSolve()
+
         print((dt.datetime.now()-startTime))
 
     
@@ -36,7 +38,6 @@ class QuantumSolver:
         """
             returns difference in time of date2-date1
         """
-        print(date1,date2)
         dt1 = dt.datetime.strptime(date1 + " " + time1, "%m/%d/%Y %H:%M")
         dt2 = dt.datetime.strptime(date2 + " " + time2, '%m/%d/%Y %H:%M')
         difference = dt2 - dt1
@@ -49,6 +50,7 @@ class QuantumSolver:
         # flight=self.df.loc[self.df["InventoryId"]==self.inv_id]
         index=self.df.loc[self.df["InventoryId"]==self.inv_id].index[0]
         flight=self.df.loc[index]
+        self.flight=flight
         list_of_feasible_flights=[]
 
         for i in range(len(self.df)):
@@ -62,13 +64,13 @@ class QuantumSolver:
             
         return list_of_feasible_flights
 
-    def __run(self,startNode,endNode):
+    def __run(self):
         self.graph = dict()
 
         # Nodes
         # for loop working
-        for i in range(len(self.df)):
-            data = self.df.loc[i]
+        for i in range(len(self.lst)):
+            data = self.lst[i]
 
             if data["InventoryId"] not in self.graph:
                 self.graph[data["InventoryId"]] = (
@@ -80,8 +82,8 @@ class QuantumSolver:
                     data["ArrivalDate"]
                 )
 
-                self.Q[i,i] = self.__diff(data["DepartureDate"], data["ArrivalDate"], data["DepartureTime"], data["ArrivalTime"])
-                if data["DepartureAirport"] == self.flight["DepartureAirport"][0]:
+                self.Q[i,i] = self.__diff(data["DepartureDate"], data["DepartureTime"], data["ArrivalDate"], data["ArrivalTime"])
+                if data["DepartureAirport"] == self.flight["DepartureAirport"]:
                     self.A[i, i] = 1
                     self.N[i, i] = 1
                 else:
@@ -96,7 +98,7 @@ class QuantumSolver:
                     else:
                         if data["DepartureAirport"] == fl2["ArrivalAirport"]:
                             self.N[i, j] = 1
-                            self.G[i,j] = self.__diff(fl2["DepartureDate"],data["ArrivalDate"],fl2["DepartureTime"],data["ArrivalTime"]) # minutes(fl2["DepartureTime"]) - minutes(data["ArrivalTime"])
+                            self.G[i,j] = self.__diff(fl2["DepartureDate"],fl2["DepartureTime"],data["ArrivalDate"],data["ArrivalTime"]) # minutes(fl2["DepartureTime"]) - minutes(data["ArrivalTime"])
                             if self.G[i,j]<60 or self.G[i,j]>720:
                                 self.G[i,j]=self.highval
                                 self.N[i,j]=0
@@ -105,9 +107,9 @@ class QuantumSolver:
                             self.G[i,j]=self.highval
 
 
-    def quantumSolve(self) ->list:
+    def quantumSolve(self):
         total = []
-        self.__run(self.flight["DepartureAirport"],self.flight["ArrivalAirport"]) # we will get the Q A B N G matrices initialised now
+        self.__run() # we will get the Q A B N G matrices initialised now
         qp = QuadraticProgram("flights")
         F = self.Q + self.A + self.B + self.N + self.G # quadratic form matrix
         L = -2*(self.A.diagonal() + self.B.diagonal())  # linear matrix
