@@ -1,15 +1,20 @@
 # from database import INV.csv
 import pandas as pd
+from qiskit_algorithms import QAOA, NumPyMinimumEigensolver
 from qiskit_optimization.applications import *
 from qiskit.circuit.library import TwoLocal
 import numpy as np
 import datetime as dt
+from scipy.optimize import minimize
 from qiskit_optimization import QuadraticProgram
 from qiskit_optimization.converters import QuadraticProgramToQubo
 from qiskit_algorithms.minimum_eigensolvers import SamplingVQE,VQE,SamplingMinimumEigensolver
 from qiskit_optimization.algorithms import MinimumEigenOptimizer
-from qiskit_algorithms.optimizers import SPSA
+from qiskit_algorithms.optimizers import SPSA,ADAM
 from qiskit.primitives import Sampler
+
+from qiskit_algorithms.optimizers import COBYLA
+from qiskit_algorithms.utils.algorithm_globals import algorithm_globals
 
 class QuantumSolver:
     df = pd.read_csv(".\INV.csv") #INV.csv
@@ -157,24 +162,32 @@ class QuantumSolver:
         qubitOp, offset = qp.to_ising()  # conversion into Ising Problem
         two = TwoLocal(self.length, 'rx', 'cx', 'linear', reps=2, insert_barriers=True)  # an ansatz circuit
         start=dt.datetime.now()
-        optimizer = SPSA(maxiter=3000) # try other optimizers
-        print(dt.datetime.now()-start)
-        start=dt.datetime.now()
-        vqe = SamplingVQE(sampler=Sampler(), ansatz=two, optimizer=optimizer)
-        print(dt.datetime.now()-start)
-        start=dt.datetime.now()
-        vqe_op1 = MinimumEigenOptimizer(vqe)
-        print(dt.datetime.now()-start)
-        start=dt.datetime.now()
-        result = vqe_op1.solve(qp)
-        print(dt.datetime.now()-start)
-        start=dt.datetime.now()
-        ans = list(result.variables_dict.values())
+        # # optimizer = SPSA(maxiter=3000) # try other optimizers
+        # print(dt.datetime.now()-start)
+        # start=dt.datetime.now()
+        # vqe = SamplingVQE(sampler=Sampler(), ansatz=two, optimizer=optimizer)
+        # print(dt.datetime.now()-start)
+        # start=dt.datetime.now()
+        # vqe_op1 = MinimumEigenOptimizer(vqe)
+        # print(dt.datetime.now()-start)
+        # start=dt.datetime.now()
+        # result = vqe_op1.solve(qp)
+        # print(dt.datetime.now()-start)
+        # start=dt.datetime.now()
+        # ans = list(result.variables_dict.values())
+
+        algorithm_globals.random_seed = 12345   
+        qaoa_mes = QAOA(sampler=Sampler(), optimizer=COBYLA())
+        qaoa_mes.ansatz=two
+        exact_mes = NumPyMinimumEigensolver()
+        qaoa = MinimumEigenOptimizer(qaoa_mes)
+        qaoa_result = qaoa.solve(qp)
+        print(qaoa_result.prettyprint())
 
         # total.append(postProcess(ans))
-        print(ans)
-        total.append(self.__postProcess(ans))
-        return total
+        # print(ans)
+        # total.append(self.__postProcess(ans))
+        # return total
 
 #             qp.minimize(constant=3,linear=L.diagonal(),quadratic=F) # matrices fed into the quadratic program
 #         for i in range(3): # 5 alternate solutions
