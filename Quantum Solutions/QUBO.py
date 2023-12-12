@@ -26,7 +26,7 @@ class QuantumSolver:
     flight=None
     Q=A=B=N=G=None
 
-    def __init__(self,inv_id):
+    def __init__(self, inv_id):
         # self.startNode,self.endNode = start,end
         startTime=dt.datetime.now()
         self.inv_id=inv_id
@@ -45,8 +45,7 @@ class QuantumSolver:
 
         print((dt.datetime.now()-startTime))
 
-    
-    def __diff(self,date1, time1, date2, time2):
+    def __diff(self, date1, date2, time1, time2):
         """
             returns difference in time of date2-date1
         """
@@ -54,7 +53,6 @@ class QuantumSolver:
         dt2 = dt.datetime.strptime(date2 + " " + time2, '%m/%d/%Y %H:%M')
         difference = dt2 - dt1
         return int(difference.total_seconds() // 60)
-
 
     def __preProcess(self):
         # start = self.df.loc[self.startNode]
@@ -80,7 +78,7 @@ class QuantumSolver:
             else:
                 self.length+=1
                 list_of_feasible_flights.append(data)
-            
+
         return list_of_feasible_flights
 
     def __run(self):
@@ -233,16 +231,15 @@ class QuantumSolver:
 #             total.append(self.__postProcess(ans))
 #         return total
 
-
-    def __postProcess(self,bitString:list) -> list:
+    def __postProcess(self, bitString: list) -> list:
         flights = []
         for i in range(len(bitString)):
             if bitString[i]==1:
                 flights.append(self.lst[i])
         for i in range(len(flights)):
             for j in range(len(flights)):
-                if i!=j :
-                    self.Q[i,j]=self.highval
+                if i != j:
+                    self.Q[i, j] = self.highval
         return flights
 
 
