@@ -9,7 +9,7 @@ from scipy.optimize import minimize
 from qiskit_optimization import QuadraticProgram
 from qiskit_optimization.converters import QuadraticProgramToQubo
 from qiskit_algorithms.minimum_eigensolvers import SamplingVQE,VQE,SamplingMinimumEigensolver
-from qiskit_optimization.algorithms import MinimumEigenOptimizer
+from qiskit_optimization.algorithms import MinimumEigenOptimizer,CplexOptimizer
 from qiskit_algorithms.optimizers import SPSA,ADAM
 from qiskit.primitives import Sampler
 
@@ -30,11 +30,11 @@ class QuantumSolver:
         # self.startNode,self.endNode = start,end
         startTime=dt.datetime.now()
         self.inv_id=inv_id
+        self.length=0
         self.lst=self.__preProcess()
         print(len(self.lst),"Total Flights:\n")
         for i in self.lst:
             print(i)
-        self.length = len(self.lst)
         self.Q = np.zeros((self.length,self.length))
         self.A,self.B,self.N,self.G=np.zeros_like(self.Q),np.zeros_like(self.Q),np.zeros_like(self.Q),np.zeros_like(self.Q) # all matrices
 
@@ -68,14 +68,17 @@ class QuantumSolver:
         for i in range(len(self.df)):
             data = self.df.loc[i]
             if index==i:
-                print("pass")
+                continue
+            if flight["DepartureAirport"] == data["ArrivalAirport"]:
                 continue
             ti = self.__diff(date1=flight["DepartureDate"],time1=flight["DepartureTime"],date2=data["ArrivalDate"],time2=data["ArrivalTime"])
             ti2 = self.__diff(date1=flight["DepartureDate"],time1=flight["DepartureTime"],date2=data["DepartureDate"],time2=data["DepartureTime"])
             # print(ti,ti2)
             if ti < 60 or ti2 > 72*60:
+                print(data["InventoryId"],ti)
                 continue
             else:
+                self.length+=1
                 list_of_feasible_flights.append(data)
             
         return list_of_feasible_flights
@@ -121,13 +124,13 @@ class QuantumSolver:
                                 self.N[j,i] = 1
                                 ti = int(self.__diff(fl2["ArrivalDate"],fl2["ArrivalTime"],data["DepartureDate"],data["DepartureTime"])*100 )# minutes(fl2["DepartureTime"]) - minutes(data["ArrivalTime"])
                                 if ti <6000 or ti >72000 :
-                                    self.G[i,j]=self.highval
+                                    self.G[i,j]=0
                                 else:
                                     self.G[i,j]=ti
                             else:
                                 self.N[j,i]=0
                                 self.G[i,j]=0
-
+        self.G=self.G.astype(int)
         print("Q:\n ",self.Q)
         print("G:\n ",self.G)
         print("A:\n ",self.A)
@@ -138,26 +141,32 @@ class QuantumSolver:
         total = []
         self.__run() # we will get the Q A B N G matrices initialised now
         qp = QuadraticProgram("flights")
-        F = self.Q + self.highval*(self.A + self.B - self.N) + self.G # quadratic form matrix
-        for i in range(self.length):
-            F=F+self.highval*np.matmul(np.reshape(self.N[:,i],(-1,1)),np.transpose(np.reshape(self.N[:,i],(-1,1))))
+        # F = self.Q + self.highval*(self.A + self.B - self.N) + self.G # quadratic form matrix
+        F = self.Q + self.G # quadratic form matrix
+        # for i in range(self.length):
+        #     F=F+self.highval*np.matmul(np.reshape(self.N[:,i],(-1,1)),np.transpose(np.reshape(self.N[:,i],(-1,1))))
             # print(i,self.N[:,i])
             # print(np.matmul(np.reshape(self.N[:,i],(-1,1)),np.transpose(np.reshape(self.N[:,i],(-1,1)))))
         F=F.astype(int)
-        # L = -2*(self.A.diagonal() + self.B.diagonal()) - 2*self.highval*(np.ones((self.A.shape[0],))) # linear matrix
+        # L = -2*(self.A.diagonal() + self.B.diagonal()) +self.highval*(np.ones((self.A.shape[0],))) # linear matrix
         L = -2*self.highval*(self.A.diagonal() + self.B.diagonal())  # linear matrix
         L=L.astype(int)
         print(L)
         print(F)
         # L = np.reshape(L,(1,self.A.shape[0]))[0]
-        qp.minimize(linear=L,quadratic=F) # matrices fed into the quadratic program
+        qp.minimize(quadratic=F) # matrices fed into the quadratic program
+        # qp.minimize(linear=L,quadratic=F) # matrices fed into the quadratic program
         qp.binary_var_list(L.size)
+        qp.linear_constraint(np.ones(L.shape),">",1)
+        qp.linear_constraint(self.A.diagonal(),"=",1)
+        qp.linear_constraint(self.B.diagonal(),"=",1)
+        print(qp.prettyprint())
 
+        qp= QuadraticProgramToQubo().convert(qp)
         # qp.
-
+        print(qp.prettyprint())
         # qp.minimize(linear=L)  # quadratic=F) # matrices fed into the quadratic program        
         # return qp
-        print(qp.objective)
 
         qubitOp, offset = qp.to_ising()  # conversion into Ising Problem
         two = TwoLocal(self.length, 'rx', 'cx', 'linear', reps=2, insert_barriers=True)  # an ansatz circuit
@@ -184,10 +193,19 @@ class QuantumSolver:
         qaoa_result = qaoa.solve(qp)
         print(qaoa_result.prettyprint())
 
+        # from qiskit_optimization.algorithms import WarmStartQAOAOptimizer
+        # qaoa_mes = QAOA(sampler=Sampler(), optimizer=COBYLA())
+        # qaoa_mes.ansatz=two
+        # ws_qaoa = WarmStartQAOAOptimizer(
+        #     pre_solver=CplexOptimizer(), relax_for_pre_solver=True, qaoa=qaoa_mes, epsilon=0.0
+        # )
+        # ws_result = ws_qaoa.solve(qp)
+        ans = list(qaoa_result.variables_dict.values())
+
         # total.append(postProcess(ans))
         # print(ans)
-        # total.append(self.__postProcess(ans))
-        # return total
+        total.append(self.__postProcess(ans[:self.length]))
+        return total
 
 #             qp.minimize(constant=3,linear=L.diagonal(),quadratic=F) # matrices fed into the quadratic program
 #         for i in range(3): # 5 alternate solutions
