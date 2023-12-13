@@ -133,14 +133,14 @@ class QuantumSolver:
             else:
                 list_of_feasible_flights.append(data)
 
-        airports = [self.flight["DepartureAirport"]]
-        feas = []
-        while len(airports) != 0:
+        airports = [self.flight["DepartureAirport"]]  # list of all feasible airports
+        feas = []  # flights which will actually be considerable in flight paths
+        while len(airports) != 0:  # BFS
             airport = airports.pop()
             for i in list_of_feasible_flights:
-                if i["DepartureAirport"] == airport:
+                if i["DepartureAirport"] == airport:  # similiar flight found
                     feas += [i]
-                    airports += i["ArrivalAirport"]
+                    airports.append(i["ArrivalAirport"])  # next time consider flights from arrival airport
 
         return feas
 
