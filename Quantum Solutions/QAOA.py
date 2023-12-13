@@ -133,14 +133,14 @@ class QuantumSolver:
             else:
                 list_of_feasible_flights.append(data)
 
-        airports = [self.flight["DepartureAirport"]]
-        feas = []
-        while len(airports) != 0:
+        airports = [self.flight["DepartureAirport"]]  # list of all feasible airports
+        feas = []  # flights which will actually be considerable in flight paths
+        while len(airports) != 0:  # BFS
             airport = airports.pop()
             for i in list_of_feasible_flights:
-                if i["DepartureAirport"] == airport:
+                if i["DepartureAirport"] == airport:  # similiar flight found
                     feas += [i]
-                    airports += i["ArrivalAirport"]
+                    airports.append(i["ArrivalAirport"])  # next time consider flights from arrival airport
 
         return feas
 
@@ -243,9 +243,9 @@ class QuantumSolver:
         # qp.quadratic_constraint(-1*np.ones((self.length,)),self.Nb,"=",0)
         print(np.linalg.det(self.Na))
         start1 = dt.datetime.now()
-        mod = qp.to_docplex()
-        mod.solve()
-        mod.print_solution()
+        # mod = qp.to_docplex()
+        # mod.solve()
+        # mod.print_solution()
         print(dt.datetime.now() - start1)
         # print(qp.prettyprint())
         # sys.exit(0)
@@ -256,13 +256,13 @@ class QuantumSolver:
 
         # qubitOp, offset = qp.to_ising()  # conversion into Ising Problem
 
-        two = TwoLocal(self.length, 'rx', 'cx', 'linear', reps=2, insert_barriers=True)  # an ansatz circuit
+        # two = TwoLocal(self.length, 'rx', 'cx', 'linear', reps=2, insert_barriers=True)  # an ansatz circuit
 
         start = dt.datetime.now()
         algorithm_globals.random_seed = 12345
 
         qaoa_mes = QAOA(sampler=Sampler(), optimizer=COBYLA())  # a qaoa instance of the quadratic program
-        qaoa_mes.ansatz = two
+        # qaoa_mes.ansatz = two
         # ws_qaoa = WarmStartQAOAOptimizer(pre_solver=CobylaOptimizer(),relax_for_pre_solver=True,qaoa=qaoa_mes,epsilon=0.0)
         ws_qaoa = WarmStartQAOAOptimizer(pre_solver=CplexOptimizer(), relax_for_pre_solver=False, qaoa=qaoa_mes,
                                          epsilon=0.0)
