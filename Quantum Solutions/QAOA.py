@@ -299,7 +299,7 @@ class QuantumSolver:
         :return: list of flights corresponding to the bitString
         """
         flights = []
-        isStarting = False;
+        isStarting = False
         isEnding = False  # TO check if path is complete (If not complete do no add this path)
         for i in range(len(bitString)):
             if bitString[i] == 1:
