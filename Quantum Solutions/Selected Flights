@@ -1,0 +1,55 @@
+InventoryId         INV-ZZ-3238963
+ScheduleId          SCH-ZZ-7787481
+AircraftType            Boeing 787
+DepartureDate           12/24/2023
+ArrivalDate             12/24/2023
+DepartureAirport               GOI
+ArrivalAirport                 DEL
+DepartureTime                23:47
+ArrivalTime                   2:27
+Name: 29, dtype: object
+
+InventoryId         INV-ZZ-5038220
+ScheduleId          SCH-ZZ-3966909
+AircraftType        Boeing 777-300
+DepartureDate           12/25/2023
+ArrivalDate             12/25/2023
+DepartureAirport               TRV
+ArrivalAirport                 PNQ
+DepartureTime                22:42
+ArrivalTime                   6:43
+Name: 53, dtype: object
+
+InventoryId         INV-ZZ-8573874
+ScheduleId          SCH-ZZ-4016963
+AircraftType                ATR 72
+DepartureDate           12/25/2023
+ArrivalDate             12/25/2023
+DepartureAirport               GAU
+ArrivalAirport                 BOM
+DepartureTime                22:42
+ArrivalTime                   6:43
+Name: 163, dtype: object
+
+InventoryId         INV-ZZ-9811407
+ScheduleId          SCH-ZZ-5336077
+AircraftType        Boeing 777-300
+DepartureDate           12/25/2023
+ArrivalDate             12/25/2023
+DepartureAirport               GOI
+ArrivalAirport                 BLR
+DepartureTime                22:42
+ArrivalTime                   6:43
+Name: 207, dtype: object
+
+InventoryId         INV-ZZ-3690792
+ScheduleId          SCH-ZZ-2990004
+AircraftType            Boeing 787
+DepartureDate           12/26/2023
+ArrivalDate             12/26/2023
+DepartureAirport               PAT
+ArrivalAirport                 BOM
+DepartureTime                16:53
+ArrivalTime                  21:53
+Name: 375, dtype: object
+
