@@ -1,3 +1,14 @@
+InventoryId          INV-ZZ-3954363
+ScheduleId           SCH-ZZ-7873449
+AircraftType        Airbus A321-200
+DepartureDate            12/17/2023
+ArrivalDate              12/17/2023
+DepartureAirport                LKO
+ArrivalAirport                  IDR
+DepartureTime                  2:05
+ArrivalTime                    3:05
+Name: 41, dtype: object
+
 InventoryId         INV-ZZ-8034577
 ScheduleId          SCH-ZZ-1430826
 AircraftType            Boeing 717
@@ -31,6 +42,248 @@ DepartureTime                 0:01
 ArrivalTime                  22:08
 Name: 46, dtype: object
 
+InventoryId         INV-ZZ-8604755
+ScheduleId          SCH-ZZ-3966909
+AircraftType        Boeing 777-300
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               TRV
+ArrivalAirport                 PNQ
+DepartureTime                14:32
+ArrivalTime                   4:56
+Name: 49, dtype: object
+
+InventoryId         INV-ZZ-5867641
+ScheduleId          SCH-ZZ-6640588
+AircraftType            Boeing 777
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               JAI
+ArrivalAirport                 BOM
+DepartureTime                13:33
+ArrivalTime                   9:22
+Name: 74, dtype: object
+
+InventoryId         INV-ZZ-9399557
+ScheduleId          SCH-ZZ-6640588
+AircraftType            Boeing 777
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               JAI
+ArrivalAirport                 BOM
+DepartureTime                19:45
+ArrivalTime                  22:07
+Name: 75, dtype: object
+
+InventoryId         INV-ZZ-7260306
+ScheduleId          SCH-ZZ-7813337
+AircraftType        Boeing 777-300
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               IDR
+ArrivalAirport                 BBI
+DepartureTime                 8:21
+ArrivalTime                  16:34
+Name: 89, dtype: object
+
+InventoryId          INV-ZZ-5252903
+ScheduleId           SCH-ZZ-1589389
+AircraftType        Airbus A321 Neo
+DepartureDate            12/17/2023
+ArrivalDate              12/17/2023
+DepartureAirport                GOI
+ArrivalAirport                  BLR
+DepartureTime                 23:47
+ArrivalTime                    2:27
+Name: 117, dtype: object
+
+InventoryId         INV-ZZ-5777553
+ScheduleId          SCH-ZZ-9004907
+AircraftType            Boeing 757
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               MAA
+ArrivalAirport                 DEL
+DepartureTime                16:53
+ArrivalTime                  21:53
+Name: 124, dtype: object
+
+InventoryId         INV-ZZ-8180279
+ScheduleId          SCH-ZZ-1474449
+AircraftType            Boeing 767
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               CCU
+ArrivalAirport                 MAA
+DepartureTime                20:38
+ArrivalTime                  13:57
+Name: 133, dtype: object
+
+InventoryId         INV-ZZ-6290023
+ScheduleId          SCH-ZZ-8297347
+AircraftType                ATR 72
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               COK
+ArrivalAirport                 IDR
+DepartureTime                13:58
+ArrivalTime                   8:18
+Name: 137, dtype: object
+
+InventoryId          INV-ZZ-5287658
+ScheduleId           SCH-ZZ-2469436
+AircraftType        Airbus A320 Neo
+DepartureDate            12/18/2023
+ArrivalDate              12/18/2023
+DepartureAirport                BOM
+ArrivalAirport                  HYD
+DepartureTime                  5:34
+ArrivalTime                    6:38
+Name: 139, dtype: object
+
+InventoryId          INV-ZZ-4866602
+ScheduleId           SCH-ZZ-4332641
+AircraftType        Airbus A320-200
+DepartureDate            12/16/2023
+ArrivalDate              12/16/2023
+DepartureAirport                AMD
+ArrivalAirport                  CNN
+DepartureTime                 23:47
+ArrivalTime                    2:27
+Name: 147, dtype: object
+
+InventoryId          INV-ZZ-1753814
+ScheduleId           SCH-ZZ-4332641
+AircraftType        Airbus A320-200
+DepartureDate            12/18/2023
+ArrivalDate              12/18/2023
+DepartureAirport                AMD
+ArrivalAirport                  CNN
+DepartureTime                 13:33
+ArrivalTime                    9:22
+Name: 148, dtype: object
+
+InventoryId         INV-ZZ-8458597
+ScheduleId          SCH-ZZ-6592378
+AircraftType            Boeing 717
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               TRV
+ArrivalAirport                 CCU
+DepartureTime                 5:27
+ArrivalTime                  21:31
+Name: 158, dtype: object
+
+InventoryId         INV-ZZ-9118591
+ScheduleId          SCH-ZZ-6592378
+AircraftType            Boeing 717
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               TRV
+ArrivalAirport                 CCU
+DepartureTime                 4:37
+ArrivalTime                  12:50
+Name: 159, dtype: object
+
+InventoryId         INV-ZZ-2085988
+ScheduleId          SCH-ZZ-9094190
+AircraftType            Boeing 777
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               COK
+ArrivalAirport                 DEL
+DepartureTime                21:14
+ArrivalTime                  20:24
+Name: 171, dtype: object
+
+InventoryId         INV-ZZ-9054516
+ScheduleId          SCH-ZZ-6660445
+AircraftType               BAe 146
+DepartureDate           12/17/2023
+ArrivalDate             12/17/2023
+DepartureAirport               CCJ
+ArrivalAirport                 JAI
+DepartureTime                 6:47
+ArrivalTime                  14:05
+Name: 187, dtype: object
+
+InventoryId         INV-ZZ-2256059
+ScheduleId          SCH-ZZ-6660445
+AircraftType               BAe 146
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               CCJ
+ArrivalAirport                 JAI
+DepartureTime                 4:53
+ArrivalTime                   7:29
+Name: 188, dtype: object
+
+InventoryId         INV-ZZ-8746052
+ScheduleId          SCH-ZZ-5071799
+AircraftType            Boeing 787
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               IDR
+ArrivalAirport                 MAA
+DepartureTime                 6:25
+ArrivalTime                  21:34
+Name: 196, dtype: object
+
+InventoryId         INV-ZZ-4770316
+ScheduleId          SCH-ZZ-5071799
+AircraftType            Boeing 787
+DepartureDate           12/17/2023
+ArrivalDate             12/17/2023
+DepartureAirport               IDR
+ArrivalAirport                 MAA
+DepartureTime                 8:16
+ArrivalTime                   4:53
+Name: 197, dtype: object
+
+InventoryId         INV-ZZ-3300271
+ScheduleId          SCH-ZZ-5071799
+AircraftType            Boeing 787
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               IDR
+ArrivalAirport                 MAA
+DepartureTime                13:27
+ArrivalTime                  10:37
+Name: 198, dtype: object
+
+InventoryId         INV-ZZ-4501568
+ScheduleId          SCH-ZZ-6301036
+AircraftType            Boeing 717
+DepartureDate           12/17/2023
+ArrivalDate             12/17/2023
+DepartureAirport               BBI
+ArrivalAirport                 MAA
+DepartureTime                16:53
+ArrivalTime                  12:06
+Name: 212, dtype: object
+
+InventoryId         INV-ZZ-1069750
+ScheduleId          SCH-ZZ-6301036
+AircraftType            Boeing 717
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               BBI
+ArrivalAirport                 MAA
+DepartureTime                20:38
+ArrivalTime                  13:57
+Name: 213, dtype: object
+
+InventoryId         INV-ZZ-7066976
+ScheduleId          SCH-ZZ-9594677
+AircraftType               BAe 146
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               CNN
+ArrivalAirport                 CCU
+DepartureTime                16:12
+ArrivalTime                  10:06
+Name: 220, dtype: object
+
 InventoryId          INV-ZZ-1442968
 ScheduleId           SCH-ZZ-4348536
 AircraftType        Airbus A320 Neo
@@ -41,4 +294,334 @@ ArrivalAirport                  BLR
 DepartureTime                  2:21
 ArrivalTime                   23:44
 Name: 230, dtype: object
+
+InventoryId          INV-ZZ-2986168
+ScheduleId           SCH-ZZ-4710588
+AircraftType        Airbus A320 Neo
+DepartureDate            12/16/2023
+ArrivalDate              12/16/2023
+DepartureAirport                LKO
+ArrivalAirport                  GOI
+DepartureTime                  6:47
+ArrivalTime                   14:05
+Name: 251, dtype: object
+
+InventoryId          INV-ZZ-6171417
+ScheduleId           SCH-ZZ-4710588
+AircraftType        Airbus A320 Neo
+DepartureDate            12/18/2023
+ArrivalDate              12/18/2023
+DepartureAirport                LKO
+ArrivalAirport                  GOI
+DepartureTime                  4:53
+ArrivalTime                    7:29
+Name: 252, dtype: object
+
+InventoryId         INV-ZZ-4314200
+ScheduleId          SCH-ZZ-4169396
+AircraftType            Boeing 777
+DepartureDate           12/17/2023
+ArrivalDate             12/17/2023
+DepartureAirport               BLR
+ArrivalAirport                 JAI
+DepartureTime                 6:47
+ArrivalTime                  14:05
+Name: 260, dtype: object
+
+InventoryId         INV-ZZ-4648477
+ScheduleId          SCH-ZZ-4169396
+AircraftType            Boeing 777
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               BLR
+ArrivalAirport                 JAI
+DepartureTime                 4:53
+ArrivalTime                   7:29
+Name: 261, dtype: object
+
+InventoryId         INV-ZZ-7379125
+ScheduleId          SCH-ZZ-3482484
+AircraftType            Boeing 787
+DepartureDate           12/17/2023
+ArrivalDate             12/17/2023
+DepartureAirport               GOI
+ArrivalAirport                 COK
+DepartureTime                21:14
+ArrivalTime                  20:24
+Name: 283, dtype: object
+
+InventoryId         INV-ZZ-3200329
+ScheduleId          SCH-ZZ-7747278
+AircraftType            Boeing 757
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               CJB
+ArrivalAirport                 HYD
+DepartureTime                23:47
+ArrivalTime                   2:27
+Name: 295, dtype: object
+
+InventoryId         INV-ZZ-1314423
+ScheduleId          SCH-ZZ-1331445
+AircraftType            Boeing 757
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               CNN
+ArrivalAirport                 HYD
+DepartureTime                 4:53
+ArrivalTime                   7:29
+Name: 300, dtype: object
+
+InventoryId         INV-ZZ-7231339
+ScheduleId          SCH-ZZ-1331445
+AircraftType            Boeing 757
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               CNN
+ArrivalAirport                 HYD
+DepartureTime                10:23
+ArrivalTime                  20:48
+Name: 301, dtype: object
+
+InventoryId          INV-ZZ-6617860
+ScheduleId           SCH-ZZ-7048209
+AircraftType        Airbus A321 Neo
+DepartureDate            12/16/2023
+ArrivalDate              12/16/2023
+DepartureAirport                BOM
+ArrivalAirport                  PAT
+DepartureTime                  8:21
+ArrivalTime                   16:34
+Name: 311, dtype: object
+
+InventoryId         INV-ZZ-4066232
+ScheduleId          SCH-ZZ-4609150
+AircraftType                ATR 72
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               IDR
+ArrivalAirport                 COK
+DepartureTime                11:26
+ArrivalTime                  21:02
+Name: 317, dtype: object
+
+InventoryId          INV-ZZ-1286842
+ScheduleId           SCH-ZZ-7255314
+AircraftType        Airbus A320-200
+DepartureDate            12/17/2023
+ArrivalDate              12/17/2023
+DepartureAirport                IDR
+ArrivalAirport                  COK
+DepartureTime                 13:55
+ArrivalTime                   20:40
+Name: 320, dtype: object
+
+InventoryId         INV-ZZ-1736100
+ScheduleId          SCH-ZZ-2529141
+AircraftType            Boeing 777
+DepartureDate           12/17/2023
+ArrivalDate             12/17/2023
+DepartureAirport               PAT
+ArrivalAirport                 HYD
+DepartureTime                 6:31
+ArrivalTime                   1:00
+Name: 330, dtype: object
+
+InventoryId          INV-ZZ-7314698
+ScheduleId           SCH-ZZ-5237867
+AircraftType        Airbus A320-200
+DepartureDate            12/16/2023
+ArrivalDate              12/16/2023
+DepartureAirport                COK
+ArrivalAirport                  CCU
+DepartureTime                 13:33
+ArrivalTime                    9:22
+Name: 340, dtype: object
+
+InventoryId          INV-ZZ-7044569
+ScheduleId           SCH-ZZ-5237867
+AircraftType        Airbus A320-200
+DepartureDate            12/18/2023
+ArrivalDate              12/18/2023
+DepartureAirport                COK
+ArrivalAirport                  CCU
+DepartureTime                 19:45
+ArrivalTime                   22:07
+Name: 341, dtype: object
+
+InventoryId          INV-ZZ-8643109
+ScheduleId           SCH-ZZ-5949538
+AircraftType        Airbus A321 Neo
+DepartureDate            12/17/2023
+ArrivalDate              12/17/2023
+DepartureAirport                CJB
+ArrivalAirport                  HYD
+DepartureTime                  8:16
+ArrivalTime                    4:53
+Name: 353, dtype: object
+
+InventoryId         INV-ZZ-1185101
+ScheduleId          SCH-ZZ-9164842
+AircraftType            Boeing 777
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               BBI
+ArrivalAirport                 LKO
+DepartureTime                13:27
+ArrivalTime                  10:37
+Name: 354, dtype: object
+
+InventoryId         INV-ZZ-5200345
+ScheduleId          SCH-ZZ-4745163
+AircraftType            Boeing 777
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               AMD
+ArrivalAirport                 JAI
+DepartureTime                23:47
+ArrivalTime                   2:27
+Name: 368, dtype: object
+
+InventoryId         INV-ZZ-4777337
+ScheduleId          SCH-ZZ-4745163
+AircraftType            Boeing 777
+DepartureDate           12/17/2023
+ArrivalDate             12/17/2023
+DepartureAirport               AMD
+ArrivalAirport                 JAI
+DepartureTime                13:33
+ArrivalTime                   9:22
+Name: 369, dtype: object
+
+InventoryId         INV-ZZ-4048001
+ScheduleId          SCH-ZZ-4745163
+AircraftType            Boeing 777
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               AMD
+ArrivalAirport                 JAI
+DepartureTime                19:45
+ArrivalTime                  22:07
+Name: 370, dtype: object
+
+InventoryId          INV-ZZ-2542122
+ScheduleId           SCH-ZZ-2688489
+AircraftType        Airbus A320 Neo
+DepartureDate            12/16/2023
+ArrivalDate              12/16/2023
+DepartureAirport                CCU
+ArrivalAirport                  LKO
+DepartureTime                  6:25
+ArrivalTime                   21:34
+Name: 381, dtype: object
+
+InventoryId          INV-ZZ-4564354
+ScheduleId           SCH-ZZ-2688489
+AircraftType        Airbus A320 Neo
+DepartureDate            12/18/2023
+ArrivalDate              12/18/2023
+DepartureAirport                CCU
+ArrivalAirport                  LKO
+DepartureTime                  8:16
+ArrivalTime                    4:53
+Name: 382, dtype: object
+
+InventoryId         INV-ZZ-7430592
+ScheduleId          SCH-ZZ-5903235
+AircraftType            Boeing 717
+DepartureDate           12/17/2023
+ArrivalDate             12/17/2023
+DepartureAirport               CJB
+ArrivalAirport                 BLR
+DepartureTime                13:55
+ArrivalTime                  20:40
+Name: 388, dtype: object
+
+InventoryId         INV-ZZ-3634363
+ScheduleId          SCH-ZZ-7320637
+AircraftType            Boeing 787
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               GOI
+ArrivalAirport                 BOM
+DepartureTime                20:38
+ArrivalTime                  13:57
+Name: 393, dtype: object
+
+InventoryId         INV-ZZ-7421499
+ScheduleId          SCH-ZZ-7320637
+AircraftType            Boeing 787
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               GOI
+ArrivalAirport                 BOM
+DepartureTime                18:46
+ArrivalTime                   0:06
+Name: 394, dtype: object
+
+InventoryId         INV-ZZ-2840882
+ScheduleId          SCH-ZZ-6644158
+AircraftType            Boeing 777
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               LKO
+ArrivalAirport                 IDR
+DepartureTime                13:58
+ArrivalTime                   8:18
+Name: 397, dtype: object
+
+InventoryId         INV-ZZ-4813856
+ScheduleId          SCH-ZZ-6644158
+AircraftType            Boeing 777
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               LKO
+ArrivalAirport                 IDR
+DepartureTime                 6:31
+ArrivalTime                   1:00
+Name: 398, dtype: object
+
+InventoryId         INV-ZZ-6224611
+ScheduleId          SCH-ZZ-1972891
+AircraftType            Boeing 777
+DepartureDate           12/17/2023
+ArrivalDate             12/17/2023
+DepartureAirport               MAA
+ArrivalAirport                 HYD
+DepartureTime                20:49
+ArrivalTime                  12:30
+Name: 404, dtype: object
+
+InventoryId         INV-ZZ-2692884
+ScheduleId          SCH-ZZ-3933513
+AircraftType               BAe 146
+DepartureDate           12/16/2023
+ArrivalDate             12/16/2023
+DepartureAirport               PNQ
+ArrivalAirport                 CNN
+DepartureTime                 6:25
+ArrivalTime                  21:34
+Name: 420, dtype: object
+
+InventoryId         INV-ZZ-9163353
+ScheduleId          SCH-ZZ-3933513
+AircraftType               BAe 146
+DepartureDate           12/17/2023
+ArrivalDate             12/17/2023
+DepartureAirport               PNQ
+ArrivalAirport                 CNN
+DepartureTime                 8:16
+ArrivalTime                   4:53
+Name: 421, dtype: object
+
+InventoryId         INV-ZZ-4685897
+ScheduleId          SCH-ZZ-3933513
+AircraftType               BAe 146
+DepartureDate           12/18/2023
+ArrivalDate             12/18/2023
+DepartureAirport               PNQ
+ArrivalAirport                 CNN
+DepartureTime                13:27
+ArrivalTime                  10:37
+Name: 422, dtype: object
 
