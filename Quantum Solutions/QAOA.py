@@ -268,8 +268,7 @@ class QuantumSolver:
                              1)  # There must be only and necessarily 1 flight with departureAirport = DepartureAirport of impacted flight
         qp.linear_constraint(self.MatDepArp, "=",
                              1)  # There must be only and necessarily 1 flight with ArrivalAirport = ArrivalAirport of impacted flight
-        for i in range(
-                self.length):  # Applies the constraint that if a flight is on(1) then there must at least 1 neighbouring flight that is on(1)
+        for i in range(self.length):  # Applies the constraint that if a flight is on(1) then there must at least 1 neighbouring flight that is on(1)
             linear = copy.deepcopy(self.MatNeigh[i, :])
             linear[i] -= 1
             qp.linear_constraint(linear, ">", 0)
@@ -293,8 +292,7 @@ class QuantumSolver:
         qaoa_mes = QAOA(sampler=Sampler(), optimizer=COBYLA(maxiter=2))  # a qaoa instance of the quadratic program
 
         # ws_qaoa = WarmStartQAOAOptimizer(pre_solver=CobylaOptimizer(),relax_for_pre_solver=True,qaoa=qaoa_mes,epsilon=0.0)
-        ws_qaoa = WarmStartQAOAOptimizer(pre_solver=CplexOptimizer(), relax_for_pre_solver=False, qaoa=qaoa_mes,
-                                         epsilon=0.0)
+        ws_qaoa = WarmStartQAOAOptimizer(pre_solver=CplexOptimizer(), relax_for_pre_solver=False, qaoa=qaoa_mes, epsilon=0.0)
         ws_qaoa_result = ws_qaoa.solve(qp)
 
         # print(ws_qaoa_result.variables_dict.values())
@@ -318,7 +316,7 @@ class QuantumSolver:
             if ans == prevAns or ans in total:
                 break
             prevAns = ans
-            if len(prevAns)==0:
+            if len(prevAns) == 0:
                 break
             total.append([self.__postProcess(ans[:self.length])])
 
